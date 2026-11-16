@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Speakly · Apprendre l'anglais de zéro au niveau bilingue</title>
-<meta name="description" content="Speakly : 140 leçons de A0 à C2, révisions espacées, suivi des erreurs, correction de l'écrit et préparation complète de l'oral d'anglais du DSCG. Gratuit, sans publicité, avec voix naturelles.">
+<title>Speakly · L'anglais de zéro au niveau bilingue, DCG et DSCG</title>
+<meta name="description" content="Speakly : 140 leçons d'anglais de A0 à C2, révisions espacées, suivi des erreurs, voix naturelles, et une préparation complète de l'anglais du DCG (UE12, écrit) et du DSCG (UE6, oral). Gratuit.">
 <meta name="theme-color" content="#4f46e5">
 <meta property="og:title" content="Speakly · Apprendre l'anglais de zéro au niveau bilingue">
-<meta property="og:description" content="140 leçons de A0 à C2 et une préparation complète à l'oral d'anglais du DSCG. Gratuit, sans publicité, avec voix naturelles.">
+<meta property="og:description" content="140 leçons de A0 à C2 et une préparation complète de l'anglais du DCG (UE12) et du DSCG (UE6). Gratuit, avec voix naturelles.">
 <meta property="og:image" content="https://speaklyyy.netlify.app/docs/images/banner.png">
 <meta property="og:url" content="https://speaklyyy.netlify.app/presentation/">
 <meta name="twitter:card" content="summary_large_image">
@@ -126,6 +126,26 @@ section{padding:84px 0}
 .step p{margin:0;font-size:14px;color:rgba(255,255,255,.8);line-height:1.5}
 .dscg .phone{box-shadow:0 40px 80px rgba(0,0,0,.35)}
 
+/* DCG et DSCG */
+.exam-head{max-width:760px}
+.exam-head h2{font-size:clamp(30px,3.6vw,44px);font-weight:800;margin:10px 0 14px}
+.exams{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:34px}
+.exam{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:26px;padding:26px;min-width:0}
+.exam-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.badge-exam{display:inline-block;background:#fde68a;color:#312e81;font-weight:800;font-size:14px;padding:6px 12px;border-radius:99px}
+.exam-format{font-weight:700;font-size:14px;color:rgba(255,255,255,.85)}
+.exam h3{font-size:22px;margin:16px 0 8px}
+.exam p{margin:0;color:rgba(255,255,255,.85)}
+.exam-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:9px}
+.exam-list li{position:relative;padding-left:24px;font-size:15px;line-height:1.45}
+.exam-list li:before{content:"";position:absolute;left:2px;top:6px;width:12px;height:7px;border-left:2.5px solid #fde68a;border-bottom:2.5px solid #fde68a;transform:rotate(-45deg)}
+.exam-phones{display:flex;gap:14px;justify-content:center;margin-top:26px}
+.exam-phones .phone{position:relative;width:min(200px,calc(50% - 7px));border-radius:32px;padding:7px;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.exam-phones .phone img{border-radius:26px}
+.exam-phones .phone:nth-child(2){margin-top:40px}
+.reform{display:flex;gap:16px;align-items:center;margin-top:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:18px 22px}
+.reform p{margin:0;color:rgba(255,255,255,.88)}
+
 /* galerie */
 .gallery{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px 24px 34px;margin:0 -24px;scrollbar-width:thin}
 .gallery figure{margin:0;flex:none;scroll-snap-align:center;text-align:center}
@@ -172,6 +192,7 @@ footer a:hover{color:var(--pri)}
   .phones{height:520px;max-width:520px;margin:0 auto;width:100%}
   .phone{width:230px}
   .levels{grid-template-columns:repeat(2,1fr)}
+  .exams{grid-template-columns:minmax(0,1fr)}
   .steps{grid-template-columns:1fr 1fr}
   .features,.install{grid-template-columns:1fr 1fr}
   .dscg{padding:44px 28px}
@@ -193,6 +214,7 @@ footer a:hover{color:var(--pri)}
   .dscg{border-radius:28px;padding:36px 20px}
   .final{border-radius:28px}
   .levels{grid-template-columns:1fr}
+  .exam{padding:20px}.reform{flex-direction:column;align-items:flex-start}
 }
 </style>
 </head>
@@ -226,7 +248,7 @@ footer a:hover{color:var(--pri)}
     <nav class="links">
       <a href="#fonctionnalites">Fonctionnalités</a>
       <a href="#parcours">Parcours</a>
-      <a href="#dscg">DSCG</a>
+      <a href="#examens">DCG · DSCG</a>
       <a href="#faq">Questions</a>
       <a class="btn sm" href="../">Ouvrir l'appli</a>
     </nav>
@@ -263,7 +285,7 @@ footer a:hover{color:var(--pri)}
         <div class="stat"><b>140</b><span>leçons de A0 à C2</span></div>
         <div class="stat"><b>1 600+</b><span>mots avec audio</span></div>
         <div class="stat"><b>11</b><span>types d'exercices</span></div>
-        <div class="stat"><b>DCG · DSCG</b><span>UE12 et UE6 préparées</span></div>
+        <div class="stat"><b>DCG · DSCG</b><span>UE12 écrite et UE6 orale</span></div>
       </div>
     </div>
   </div>
@@ -343,36 +365,50 @@ footer a:hover{color:var(--pri)}
     </div>
   </section>
 
-  <!-- DSCG -->
-  <section id="dscg" style="padding-top:20px">
+  <!-- DCG ET DSCG -->
+  <section id="examens" style="padding-top:20px">
     <div class="wrap">
       <div class="dscg reveal">
-        <div class="split">
-          <div>
-            <span class="kicker">Préparation DCG · UE12 et DSCG · UE6</span>
-            <h2>Prêt pour l'oral d'anglais des affaires</h2>
-            <p class="lead">Un article de presse, une heure de préparation, trente minutes face au jury. Speakly t'entraîne sur tout le programme, même si tu pars de zéro. Et pour le DCG (UE12, écrit de 3 heures) : synthèses en français, commentaires et documents professionnels corrigés, plus une épreuve blanche chronométrée.</p>
-            <div class="themes">
-              <div class="theme"><span>1</span>Gouvernance et RSE</div>
-              <div class="theme"><span>2</span>Systèmes d'information et IA</div>
-              <div class="theme"><span>3</span>Finance</div>
-              <div class="theme"><span>4</span>Comptabilité et audit</div>
-              <div class="theme"><span>5</span>Management et RH</div>
-              <div class="theme"><span>6</span>Production</div>
-              <div class="theme"><span>7</span>Marketing et publicité</div>
+        <div class="exam-head">
+          <span class="kicker">Expertise comptable</span>
+          <h2>Prêt pour l'anglais du DCG et du DSCG</h2>
+          <p class="lead">Deux épreuves très différentes, deux préparations complètes. Même si tu pars de zéro, le parcours t'amène au niveau B2 attendu, avec une unité d'anglais professionnel à chaque niveau.</p>
+        </div>
+        <div class="exams">
+          <div class="exam">
+            <div class="exam-top"><span class="badge-exam">DCG · UE12</span><span class="exam-format">Écrit · 3 heures</span></div>
+            <h3>Anglais des affaires, à l'écrit</h3>
+            <p>À partir de documents en anglais : une synthèse en français, un commentaire en anglais et un document professionnel.</p>
+            <ul class="exam-list">
+              <li>Six thèmes du programme : l'entreprise, financement et RSE, travail et RH, innovation, numérique, économie et société</li>
+              <li>Synthèses en français corrigées automatiquement</li>
+              <li>Commentaires, e-mails, lettres et comptes rendus en anglais notés sur 20</li>
+              <li>Épreuve blanche chronométrée de 3 heures</li>
+            </ul>
+            <div class="exam-phones">
+              <div class="phone"><picture><source srcset="img/dark-dcg.webp" media="(prefers-color-scheme: dark)"><img src="img/light-dcg.webp" alt="Préparation DCG" loading="lazy" width="585" height="1266"></picture></div>
+              <div class="phone"><img src="img/light-dcgsynth.webp" alt="Synthèse corrigée automatiquement" loading="lazy" width="585" height="1266"></div>
             </div>
           </div>
-          <div class="media">
-            <div class="phone"><picture><source srcset="img/dark-dscg.webp" media="(prefers-color-scheme: dark)"><img src="img/light-dscg.webp" alt="Tableau de bord de la préparation DSCG" loading="lazy" width="585" height="1266"></picture></div>
-            <div class="phone"><img src="img/light-oral.webp" alt="Oral blanc chronométré" loading="lazy" width="585" height="1266"></div>
+          <div class="exam">
+            <div class="exam-top"><span class="badge-exam">DSCG · UE6</span><span class="exam-format">Oral · 1 h de préparation + 30 min</span></div>
+            <h3>Anglais des affaires, à l'oral</h3>
+            <p>Un article de presse découvert le jour même : une synthèse, une réponse argumentée, puis un échange avec le jury.</p>
+            <ul class="exam-list">
+              <li>Les sept thèmes du programme, de la gouvernance au marketing</li>
+              <li>Vocabulaire, notions clés et articles d'entraînement</li>
+              <li>Phrases utiles pour présenter, nuancer et répondre au jury</li>
+              <li>Oral blanc chronométré, avec enregistrement de ta voix</li>
+            </ul>
+            <div class="exam-phones">
+              <div class="phone"><picture><source srcset="img/dark-dscg.webp" media="(prefers-color-scheme: dark)"><img src="img/light-dscg.webp" alt="Préparation DSCG" loading="lazy" width="585" height="1266"></picture></div>
+              <div class="phone"><img src="img/light-oral.webp" alt="Oral blanc chronométré" loading="lazy" width="585" height="1266"></div>
+            </div>
           </div>
         </div>
-        <div class="steps">
-          <div class="step"><b>Étape 1</b><h3>Vocabulaire</h3><p>18 termes clés par thème, avec audio et révisions.</p></div>
-          <div class="step"><b>Étape 2</b><h3>Notions</h3><p>Savoir définir les concepts en anglais.</p></div>
-          <div class="step"><b>Étape 3</b><h3>Article</h3><p>Un texte d'actualité et ses questions.</p></div>
-          <div class="step"><b>Étape 4</b><h3>Synthèse</h3><p>Rédigée puis corrigée automatiquement.</p></div>
-          <div class="step"><b>Étape 5</b><h3>Oral blanc</h3><p>Chronométré, enregistré, avec questions du jury.</p></div>
+        <div class="reform">
+          <div><span class="badge-exam">Réforme 2026</span></div>
+          <p>Nouveaux programmes enseignés dès la rentrée 2026, premières épreuves réformées en 2027 : l'appli suit les nouveaux référentiels et résume ce qui change pour le DCG et le DSCG.</p>
         </div>
       </div>
     </div>
@@ -388,6 +424,8 @@ footer a:hover{color:var(--pri)}
         <figure><div class="phone"><img src="img/light-practice.webp" alt="Onglet Pratique" loading="lazy" width="585" height="1266"></div><figcaption>Pratique<small>13 entraînements</small></figcaption></figure>
         <figure><div class="phone"><img src="img/light-report.webp" alt="Correction de l'expression écrite" loading="lazy" width="585" height="1266"></div><figcaption>Écrit corrigé<small>Note sur 20 et conseils</small></figcaption></figure>
         <figure><div class="phone"><img src="img/light-dialogue.webp" alt="Dialogue de situation" loading="lazy" width="585" height="1266"></div><figcaption>Dialogues<small>Situations réelles</small></figcaption></figure>
+        <figure><div class="phone"><img src="img/light-dcgmock.webp" alt="Épreuve blanche DCG" loading="lazy" width="585" height="1266"></div><figcaption>Épreuve blanche DCG<small>3 heures chronométrées</small></figcaption></figure>
+        <figure><div class="phone"><img src="img/light-routine.webp" alt="Routine quotidienne" loading="lazy" width="585" height="1266"></div><figcaption>Routine<small>Séries, oral, journal</small></figcaption></figure>
         <figure><div class="phone"><img src="img/light-theme.webp" alt="Thème DSCG" loading="lazy" width="585" height="1266"></div><figcaption>Thèmes DSCG<small>5 étapes par thème</small></figcaption></figure>
         <figure><div class="phone"><img src="img/light-exam.webp" alt="Examens de fin de niveau" loading="lazy" width="585" height="1266"></div><figcaption>Examens<small>Certificats par niveau</small></figcaption></figure>
         <figure><div class="phone"><img src="img/dark-home.webp" alt="Accueil en mode sombre" loading="lazy" width="585" height="1266"></div><figcaption>Mode sombre<small>Automatique</small></figcaption></figure>
@@ -418,7 +456,8 @@ footer a:hover{color:var(--pri)}
         <details class="reveal"><summary>Est-ce vraiment gratuit ?<svg class="ic" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><use href="#i-plus"/></svg></summary><p>Oui : pas d\'abonnement ni de publicité. Le compte est gratuit : un pseudo et un code secret suffisent, sans e-mail. Le code est public sur GitHub.</p></details>
         <details class="reveal"><summary>Où est enregistrée ma progression ?<svg class="ic" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><use href="#i-plus"/></svg></summary><p>Sur ton compte, en ligne, et sur ton appareil. Tu la retrouves en te connectant avec ton pseudo et ton code secret sur n\'importe quel téléphone ou ordinateur. Le code n\'est jamais stocké en clair.</p></details>
         <details class="reveal"><summary>Est-ce que ça marche sans connexion ?<svg class="ic" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><use href="#i-plus"/></svg></summary><p>Oui, après une première connexion : les leçons fonctionnent hors ligne et ta progression se synchronise dès que tu retrouves du réseau. Les voix naturelles et la correction approfondie de l\'écrit ont besoin d\'Internet ; sans réseau, la voix de l\'appareil prend le relais.</p></details>
-        <details class="reveal"><summary>À qui s'adresse le mode DSCG ?<svg class="ic" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><use href="#i-plus"/></svg></summary><p>Aux candidats de l'UE6 Anglais des affaires. Il couvre les sept thèmes du programme avec vocabulaire, notions, articles, synthèses et oraux blancs. Le programme est présenté d'après l'arrêté du 4 août 2025 : vérifie les modalités de ta session sur le texte officiel.</p></details>
+        <details class="reveal"><summary>À qui s'adressent les modes DCG et DSCG ?<svg class="ic" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><use href="#i-plus"/></svg></summary><p>Aux étudiants et candidats de l'expertise comptable. Le mode DCG prépare l'UE12 Anglais des affaires, une épreuve écrite de 3 heures (synthèse en français, commentaire et document professionnel en anglais). Le mode DSCG prépare l'UE6, un oral sur un article de presse. Tu choisis ton objectif au démarrage et tu peux en changer à tout moment.</p></details>
+        <details class="reveal"><summary>La réforme 2026 est-elle prise en compte ?<svg class="ic" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><use href="#i-plus"/></svg></summary><p>Oui. Les nouveaux programmes (arrêté du 4 août 2025) s'appliquent aux enseignements dès la rentrée 2026 et aux épreuves à partir de 2027 ; la session 2026 suit encore l'ancien programme. Un écran de l'appli résume ce qui change. Vérifie toujours les modalités de ta session sur le texte officiel.</p></details>
         <details class="reveal"><summary>Combien de temps faut-il par jour ?<svg class="ic" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><use href="#i-plus"/></svg></summary><p>Tu choisis ton objectif quotidien, de 10 à 100 XP. Une leçon prend environ 10 minutes, la séance du jour 5 à 10 minutes. La régularité compte plus que la durée.</p></details>
       </div>
     </div>

@@ -10,14 +10,15 @@
 <p align="center">
   <img src="https://img.shields.io/badge/le%C3%A7ons-140-7c3aed?style=flat-square" alt="140 leçons">
   <img src="https://img.shields.io/badge/niveaux-A0%20%E2%86%92%20C2-4f46e5?style=flat-square" alt="Niveaux A0 à C2">
-  <img src="https://img.shields.io/badge/DSCG-UE6%20Anglais%20des%20affaires-f59e0b?style=flat-square" alt="DSCG UE6">
+  <img src="https://img.shields.io/badge/DCG-UE12%20%C3%A9crit-f59e0b?style=flat-square" alt="DCG UE12">
+  <img src="https://img.shields.io/badge/DSCG-UE6%20oral-f59e0b?style=flat-square" alt="DSCG UE6">
   <img src="https://img.shields.io/badge/PWA-hors%20ligne-059669?style=flat-square" alt="PWA hors ligne">
   <img src="https://img.shields.io/badge/JavaScript-sans%20framework-f7df1e?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript sans framework">
 </p>
 
 <p align="center">
   <b>Speakly</b> est une application pour apprendre l'anglais en partant de zéro jusqu'au niveau quasi bilingue,<br>
-  avec un mode complet pour préparer l'oral d'anglais du <b>DSCG</b>.<br>
+  avec une préparation complète de l'anglais du <b>DCG</b> (UE12, écrit) et du <b>DSCG</b> (UE6, oral).<br>
   Elle fonctionne dans le navigateur, sur téléphone comme sur ordinateur, avec un compte gratuit qui sauvegarde ta progression, et même hors ligne.
 </p>
 
@@ -31,7 +32,6 @@
 - [Préparation DCG (UE12)](#préparation-dcg-ue12)
 - [Préparation DSCG](#préparation-dscg)
 - [Installer l'application](#installer-lapplication)
-- [Lancer le projet en local](#lancer-le-projet-en-local)
 - [Organisation du code](#organisation-du-code)
 - [Remarques](#remarques)
 
@@ -39,7 +39,7 @@
 
 <p align="center"><img src="docs/images/apprendre.png" alt="Apprendre : leçon, exercices d'association, correction immédiate" width="100%"></p>
 <p align="center"><img src="docs/images/progresser.png" alt="Progresser : onglet Erreurs, Pratique et suivi des progrès" width="100%"></p>
-<p align="center"><img src="docs/images/dscg.png" alt="Préparer le DSCG : tableau de bord, thèmes et oral blanc" width="100%"></p>
+<p align="center"><img src="docs/images/examens.png" alt="Préparer le DCG et le DSCG : préparation DCG, copie corrigée, oral blanc DSCG" width="100%"></p>
 <p align="center"><img src="docs/images/entrainer.png" alt="S'entraîner : correction de l'écrit, dialogues et examens" width="100%"></p>
 <p align="center"><img src="docs/images/sombre.png" alt="Mode sombre" width="100%"></p>
 
@@ -59,7 +59,7 @@
 | **Pratique** | Séance du jour, 110 verbes irréguliers, conjugaison sur 11 temps, histoires à écouter, dialogues de situation, paires de sons, nombres et heures, « corrige l'erreur », phrasal verbs, expressions idiomatiques, faux amis. |
 | **Correction de l'écrit** | 14 sujets de rédaction notés sur 20 : fautes soulignées et expliquées en français, conseils et corrigé modèle. Fonctionne hors ligne, avec une analyse complémentaire en ligne facultative. |
 | **Examens et certificats** | Un examen de 20 questions par niveau, certificat à partir de 80 %. |
-| **Ressources** | Grammaire, lexique de plus de 1 600 mots, tableau des verbes irréguliers, guide de prononciation, référentiels CECRL et DSCG. |
+| **Ressources** | Grammaire, lexique de plus de 1 600 mots, tableau des verbes irréguliers, guide de prononciation, référentiels CECRL, DCG et DSCG, résumé de la réforme 2026. |
 | **Progrès** | Série de jours, XP, objectif quotidien, précision, maîtrise par niveau, 24 badges. |
 | **Confort** | Mode sombre automatique, installation sur l'écran d'accueil, fonctionnement hors ligne, aucune publicité. |
 
@@ -102,18 +102,6 @@ Ouvre **[speaklyyy.netlify.app](https://speaklyyy.netlify.app/)** puis :
 
 > Adresse de secours : [tauwni.github.io/Speakly](https://tauwni.github.io/Speakly/) (même application, hébergée par GitHub Pages). La progression n'est pas partagée entre les deux adresses.
 
-## Lancer le projet en local
-
-Aucune installation ni compilation : ce sont des fichiers statiques. Il suffit de les servir avec un petit serveur web :
-
-```bash
-git clone https://github.com/Tauwni/Speakly.git
-cd Speakly
-python3 -m http.server 8000
-```
-
-Puis ouvre http://localhost:8000.
-
 ## Organisation du code
 
 ```
@@ -135,6 +123,7 @@ Speakly/
 │   ├── a0.js … c2.js   Leçons par niveau
 │   ├── more.js         Unités d'anglais professionnel
 │   ├── extra.js        Verbes, dialogues, histoires, faux amis, sujets d'écriture…
+│   ├── dcg.js          Programme, thèmes et sujets du DCG, réforme 2026
 │   └── dscg.js         Programme, thèmes et articles du DSCG
 ├── sw.js               Fonctionnement hors ligne
 ├── manifest.json       Installation sur l'écran d'accueil
@@ -144,7 +133,7 @@ Speakly/
 
 ## Remarques
 
-- Le format de l'épreuve et le programme DSCG sont présentés d'après l'arrêté du 4 août 2025 (Bulletin officiel n° 32 du 28 août 2025), tel que repris par des sites de préparation. Vérifie les modalités de ta session sur le texte officiel.
-- Les articles du mode DSCG sont des textes d'entraînement rédigés pour l'application, pas de vrais articles de presse.
+- Les formats d'épreuve et les programmes du DCG et du DSCG sont présentés d'après l'arrêté du 4 août 2025 (Bulletin officiel n° 32 du 28 août 2025), tel que repris par des sites de préparation. Vérifie les modalités de ta session sur le texte officiel.
+- Les documents et articles des modes DCG et DSCG sont des textes d'entraînement rédigés pour l'application, pas de vrais articles de presse.
 - Les voix sont des voix neuronales naturelles (Deepgram Aura, via Cloudflare Workers AI), générées une fois puis gardées en mémoire ; hors ligne, la voix de l'appareil prend le relais. La reconnaissance vocale et l'enregistrement dépendent du navigateur et de l'autorisation du micro.
 - La correction en ligne, facultative, envoie le texte au service LanguageTool. Elle peut être désactivée sous le bouton « Corriger mon texte ».
