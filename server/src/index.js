@@ -1,3 +1,4 @@
+import { adminStats } from "./admin.js";
 // Speakly : serveur de comptes (Cloudflare Worker + base D1)
 // Pseudo + code secret à 6 chiffres. Le code n'est jamais stocké : seulement une empreinte PBKDF2 salée,
 // combinée à un secret serveur (PEPPER). Session par jeton aléatoire envoyé dans l'en-tête Authorization.
@@ -30,7 +31,7 @@ async function auth(req, env) {
   const t = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   if (!/^[0-9a-f]{64}$/.test(t)) return null;
   const s = await env.DB.prepare("SELECT s.user_id AS id, u.name, u.version FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?").bind(await sha(t)).first();
-  if (s) await env.DB.prepare("UPDATE sessions SET last_seen = ? WHERE token = ?").bind(Date.now(), await sha(t)).run();
+  if (s) await env.DB.batch([env.DB.prepare("UPDATE sessions SET last_seen = ? WHERE token = ?").bind(Date.now(), await sha(t)), env.DB.prepare("INSERT OR IGNORE INTO activity (day, user_id) VALUES (?, ?)").bind(new Date().toISOString().slice(0, 10), s.id)]);
   return s ? { ...s, token: t } : null;
 }
 async function newSession(env, id) {
@@ -86,6 +87,19 @@ export default {
         const bad = await checkPin(env, u, body.pin);
         if (bad) return json(req, { error: bad.error }, bad.status);
         return json(req, { token: await newSession(env, id), name: u.name, data: u.data, version: u.version });
+      }
+
+      if (path === "/api/admin" && req.method === "POST") {
+        const lock = await env.DB.prepare("SELECT n, until FROM admin_guard WHERE id = 1").first() || { n: 0, until: 0 };
+        if (lock.until > Date.now()) return json(req, { error: `Trop d'essais : réessaie dans ${Math.ceil((lock.until - Date.now()) / 60000)} min` }, 429);
+        const ok = env.ADMIN_CODE && typeof body.code === "string" && same(await sha(body.code.trim().toUpperCase()), await sha(String(env.ADMIN_CODE).toUpperCase()));
+        if (!ok) {
+          const n = (lock.n || 0) + 1, locked = n >= 5;
+          await env.DB.prepare("INSERT INTO admin_guard (id, n, until) VALUES (1, ?, ?) ON CONFLICT(id) DO UPDATE SET n = excluded.n, until = excluded.until").bind(locked ? 0 : n, locked ? Date.now() + 30 * 60000 : 0).run();
+          return json(req, { error: locked ? "Trop d'essais : panel bloqué 30 min" : "Code admin incorrect" }, 401);
+        }
+        if (lock.n) await env.DB.prepare("UPDATE admin_guard SET n = 0 WHERE id = 1").run();
+        return json(req, await adminStats(env));
       }
 
       const me = await auth(req, env);

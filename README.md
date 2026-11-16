@@ -117,6 +117,7 @@ Speakly/
 ├── dcgmode.js          Mode Préparation DCG et écran Réforme 2026
 ├── sync.js             Compte (connexion obligatoire) et synchronisation
 ├── voice.js            Voix naturelles et choix de la voix
+├── admin/              Panel d'administration (statistiques, accès par code)
 ├── server/             Serveur de comptes (Cloudflare Worker + base D1)
 ├── data/
 │   ├── core.js         Moteur de contenu des leçons

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#4f46e5">
+<title>Speakly · Administration</title>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6fa;--surface:#fff;--surface2:#f0f1f7;--ink:#0f172a;--ink2:#475569;--muted:#94a3b8;--line:#e6e8f0;--pri:#4f46e5;--pri2:#7c3aed;--pri-soft:#eef0ff;--bar:#6366f1;--bar2:#c7d2fe;--ok:#059669;--ko:#e11d48;--shadow:0 1px 2px rgba(15,23,42,.04),0 4px 16px rgba(15,23,42,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0d17;--surface:#151826;--surface2:#1d2133;--ink:#eef0f8;--ink2:#a3abc2;--muted:#6b7390;--line:#262a3e;--pri-soft:#232650;--bar:#818cf8;--bar2:#3730a3;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+.brand small{display:block;font-size:12px;font-weight:600;color:var(--ink2)}
+.btn{border:0;border-radius:12px;padding:11px 16px;font:700 14px inherit;font-family:inherit;cursor:pointer;background:var(--pri);color:#fff}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.muted{color:var(--ink2)}.small{font-size:13px}
+.card{background:var(--surface);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.two{grid-template-columns:1fr 1fr}
+.three{grid-template-columns:repeat(3,1fr)}
+.kpi b{display:block;font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:4px}
+.kpi span{font-size:13px;color:var(--ink2);font-weight:600}
+.kpi small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+section{margin-top:26px}
+section>h2{font-size:18px;margin-bottom:12px}
+.card h3{font-size:15px;margin-bottom:12px}
+/* colonnes (séries sur 30 jours) */
+.cols{display:flex;align-items:flex-end;gap:2px;height:140px;border-bottom:1px solid var(--line);position:relative}
+.cols .c{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;position:relative;cursor:default}
+.cols .c i{display:block;background:var(--bar);border-radius:4px 4px 0 0;min-height:0}
+.cols .c:hover i{background:var(--pri2)}
+.cols .c.zero i{background:transparent}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;font-weight:600;padding:6px 9px;border-radius:8px;z-index:50;opacity:0;transition:opacity .1s;white-space:nowrap}
+/* barres horizontales */
+.hb{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:8px 10px;align-items:center;font-size:13px}
+.hb .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2);font-weight:600}
+.hb .t{height:12px;background:var(--surface2);border-radius:6px;overflow:hidden}
+.hb .t i{display:block;height:100%;background:var(--bar);border-radius:6px}
+.hb .v{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;min-width:28px}
+.empty{color:var(--muted);font-size:13px}
+/* tableau */
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--ink2);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+th.num,td.num{text-align:right}
+td{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-variant-numeric:tabular-nums}
+tr:last-child td{border:0}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--pri-soft);color:var(--pri)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--muted)}
+.dot.on{background:var(--ok)}
+input.txt{width:100%;padding:15px;font-size:20px;letter-spacing:.12em;text-transform:uppercase;text-align:center;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-family:inherit;font-weight:700;outline:none}
+input.txt:focus{border-color:var(--pri)}
+.login{max-width:420px;margin:10vh auto 0;text-align:center}
+.login .card{text-align:left;margin-top:20px}
+.err{color:var(--ko);font-weight:600;font-size:14px;min-height:20px;margin:10px 0 0}
+.search{width:100%;max-width:280px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:inherit;font-size:14px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<div class="tip" id="tip"></div>
+<script src="../icons.js"></script>
+<script src="../data/core.js"></script>
+<script src="../data/a0.js"></script><script src="../data/a1.js"></script><script src="../data/a2.js"></script><script src="../data/b1.js"></script><script src="../data/b2.js"></script><script src="../data/c1.js"></script><script src="../data/c2.js"></script><script src="../data/more.js"></script>
+<script>
+(function () {
+  var API = "https://speakly-api.agenda-dcg-pdf-worker.workers.dev/api/admin";
+  var root = document.getElementById("root"), tip = document.getElementById("tip");
+  var LESSONS = {}; try { LEVELS.forEach(function (l) { l.units.forEach(function (u) { u.lessons.forEach(function (x) { LESSONS[x.id] = x.level + " · " + x.title; }); }); }); } catch (e) {}
+  var MOD = { irr: "Verbes irréguliers", conj: "Conjugaison", pron: "Prononciation", num: "Nombres et heures", fix: "Corrige l'erreur", phr: "Verbes à particule", idi: "Expressions", ff: "Faux amis", daily: "Séance du jour", dlg: "Dialogues", sto: "Histoires", exam: "Examens", dscgV: "DSCG vocabulaire", dscgN: "DSCG notions", dscgA: "DSCG articles", dscgOral: "DSCG oraux blancs", dscgPhr: "DSCG phrases", dcgV: "DCG vocabulaire" };
+  var CATS = { gram: "Grammaire", conj: "Verbes et conjugaison", vocab: "Vocabulaire", expr: "Expressions et faux amis", listen: "Écoute et dictée", sent: "Phrases et traduction", read: "Lecture", dscg: "DSCG", dcg: "DCG" };
+  var RT = { daily: "Leçon ou séance du jour", review: "Révisions", serie: "Épisode ou film en VO", speak: "Parler à voix haute", write: "Journal écrit", listen: "Podcast", read: "Lecture" };
+  var VOICES = { pandora: "Pandora (UK, femme)", draco: "Draco (UK, homme)", thalia: "Thalia (US, femme)", apollo: "Apollo (US, homme)", device: "Voix de l'appareil" };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var fmtN = function (n) { return Number(n || 0).toLocaleString("fr-FR"); };
+  var fmtD = function (t) { return t ? new Date(t).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "2-digit" }) : "-"; };
+  var ago = function (t) { if (!t) return "-"; var m = Math.round((Date.now() - t) / 60000); if (m < 2) return "à l'instant"; if (m < 60) return "il y a " + m + " min"; var h = Math.round(m / 60); if (h < 24) return "il y a " + h + " h"; var d = Math.round(h / 24); return "il y a " + d + " j"; };
+
+  function login(msg) {
+    root.innerHTML = '<div class="login"><div style="display:inline-block">' + logo(64) + '</div><h1 style="margin-top:12px">Administration</h1><p class="muted">Statistiques d\'utilisation de Speakly</p>' +
+      '<div class="card"><p class="small muted" style="margin:0 0 8px">Code admin</p><input class="txt" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX"><p class="err" id="err">' + esc(msg || "") + '</p><button class="btn" id="go" style="width:100%;margin-top:6px">Ouvrir le panel</button></div></div>';
+    var go = function () { var c = document.getElementById("code").value.trim(); if (c) load(c); };
+    document.getElementById("go").onclick = go;
+    document.getElementById("code").onkeydown = function (e) { if (e.key === "Enter") go(); };
+    document.getElementById("code").focus();
+  }
+  function load(code) {
+    var b = document.getElementById("go"); if (b) { b.disabled = true; b.textContent = "Chargement…"; }
+    fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: code }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (x) { if (!x.ok) { try { sessionStorage.removeItem("spk-admin"); } catch (e) {} return login(x.j.error || "Erreur"); } try { sessionStorage.setItem("spk-admin", code); } catch (e) {} render(x.j, code); })
+      .catch(function () { login("Pas de connexion au serveur."); });
+  }
+
+  // ----- graphiques -----
+  function cols(values, labels, unit) {
+    var max = Math.max.apply(null, values.concat([1]));
+    return '<div class="cols">' + values.map(function (v, i) { return '<div class="c' + (v ? "" : " zero") + '" data-tip="' + esc(labels[i] + " : " + fmtN(v) + " " + unit) + '"><i style="height:' + (v / max * 100) + '%"></i></div>'; }).join("") + '</div>' +
+      '<div class="axis"><span>' + esc(labels[0]) + '</span><span>' + esc(labels[Math.floor(labels.length / 2)]) + '</span><span>' + esc(labels[labels.length - 1]) + '</span></div>';
+  }
+  function hbars(pairs, nameFn) {
+    pairs = pairs.filter(function (p) { return p[1] > 0; });
+    if (!pairs.length) return '<p class="empty">Pas encore de données.</p>';
+    var max = Math.max.apply(null, pairs.map(function (p) { return p[1]; }));
+    return '<div class="hb">' + pairs.map(function (p) { var n = nameFn ? nameFn(p[0]) : p[0]; return '<span class="l" title="' + esc(n) + '">' + esc(n) + '</span><span class="t"><i style="width:' + (p[1] / max * 100) + '%"></i></span><span class="v">' + fmtN(p[1]) + '</span>'; }).join("") + '</div>';
+  }
+  var obj = function (o) { return Object.keys(o).map(function (k) { return [k, o[k]]; }); };
+  var kpi = function (label, v, sub) { return '<div class="card kpi"><span>' + label + '</span><b>' + v + '</b>' + (sub ? '<small>' + sub + '</small>' : "") + '</div>'; };
+  var card = function (title, body, note) { return '<div class="card"><h3>' + title + '</h3>' + body + (note ? '<p class="small muted" style="margin:12px 0 0">' + note + '</p>' : "") + '</div>'; };
+
+  function render(d, code) {
+    var K = d.kpi, L = d.learning, days = d.series.days.map(function (x) { return x.slice(8, 10) + "/" + x.slice(5, 7); });
+    var activePct = K.users ? Math.round(K.active7 / K.users * 100) : 0;
+    root.innerHTML =
+      '<div class="top"><div class="brand">' + logo(38) + '<div>Speakly · Administration<small>Mis à jour ' + new Date(d.generated).toLocaleString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) + '</small></div></div>' +
+      '<div style="display:flex;gap:8px"><button class="btn ghost" id="rf">Actualiser</button><button class="btn ghost" id="lo">Fermer</button></div></div>' +
+
+      '<div class="grid kpis">' + kpi("Comptes", fmtN(K.users), "+" + K.new7 + " cette semaine") + kpi("Actifs aujourd'hui", fmtN(K.active1)) + kpi("Actifs sur 7 jours", fmtN(K.active7), activePct + " % des comptes") + kpi("Actifs sur 30 jours", fmtN(K.active30)) + '</div>' +
+      '<div class="grid kpis" style="margin-top:14px">' + kpi("Leçons terminées", fmtN(L.lessonsTotal), L.lessonsAvg + " par compte en moyenne") + kpi("XP gagnés", fmtN(L.xpTotal), fmtN(L.xpAvg) + " par compte") + kpi("Taux de bonnes réponses", L.accuracy + " %", fmtN(L.answers) + " réponses") + kpi("Connexions (7 j)", fmtN(K.logins7), fmtN(K.sessions) + " sessions ouvertes") + '</div>' +
+
+      '<section><h2>Activité sur 30 jours</h2><div class="grid two">' +
+      card("Utilisateurs actifs par jour", cols(d.series.dau, days, "actif(s)"), "Comptés à partir de la mise en place du panel.") +
+      card("Nouveaux comptes par jour", cols(d.series.signups, days, "inscription(s)")) +
+      card("Connexions par jour", cols(d.series.logins, days, "connexion(s)")) +
+      card("Voix naturelles générées par jour", cols(d.series.tts, days, "phrase(s)"), fmtN(d.tts.total) + " phrases générées au total, gardées en mémoire ensuite. Plafond : 4 000 par jour.") +
+      '</div></section>' +
+
+      '<section><h2>Profil des apprenants</h2><div class="grid three">' +
+      card("Niveau actuel", hbars(obj(d.levels))) +
+      card("Objectif choisi", hbars(obj(d.goals))) +
+      card("Voix choisie", hbars(obj(d.voices), function (k) { return VOICES[k] || k; })) +
+      card("Meilleure série de jours", hbars(obj(d.streaks), function (k) { return k + " jour" + (k === "1-2" || k === "0" ? "" : "s"); })) +
+      card("Certificats obtenus", hbars(obj(d.certs))) +
+      card("Note des leçons", hbars([["3 étoiles", L.stars[3] || 0], ["2 étoiles", L.stars[2] || 0], ["1 étoile", L.stars[1] || 0]])) +
+      '</div></section>' +
+
+      '<section><h2>Apprentissage</h2><div class="grid two">' +
+      card("Leçons les plus terminées", hbars(L.topLessons, function (k) { return LESSONS[k] || k; })) +
+      card("Erreurs par thème", hbars(d.errors.cats, function (k) { return CATS[k] || k; }), fmtN(d.errors.todo) + " erreurs à retravailler, " + fmtN(d.errors.fixed) + " corrigées.") +
+      card("Entraînements les plus utilisés", hbars(d.practice.modules, function (k) { return MOD[k] || k; }), fmtN(d.practice.writings) + " textes rédigés" + (d.practice.writingAvg != null ? ", note moyenne " + String(d.practice.writingAvg).replace(".", ",") + " / 20" : "") + ". " + fmtN(d.practice.resumes) + " session(s) laissée(s) en cours.") +
+      card("Routine quotidienne", hbars(d.routine.items, function (k) { return RT[k] || k; }), fmtN(d.routine.users) + " compte(s) utilisent la routine, " + fmtN(d.routine.myWords) + " mot(s) ajouté(s) au carnet.") +
+      '</div>' +
+      '<div class="grid kpis" style="margin-top:14px">' + kpi("Mots en révision", fmtN(L.srs), fmtN(L.mastered) + " maîtrisés") + kpi("Test de niveau", fmtN(L.placement), "comptes placés au-dessus de A0") + kpi("Préparation DCG", fmtN(d.exams.dcgUsers), "comptes") + kpi("Préparation DSCG", fmtN(d.exams.dscgUsers), fmtN(d.exams.dscgOrals) + " oraux blancs") + '</div></section>' +
+
+      '<section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><h2>Comptes (' + d.users.length + ')</h2><input class="search" id="q" placeholder="Rechercher un pseudo"></div>' +
+      '<div class="card tbl"><table><thead><tr>' + [["name", "Pseudo"], ["last", "Dernière activité"], ["created", "Inscrit le"], ["level", "Niveau"], ["goal", "Objectif"], ["xp", "XP", 1], ["lessons", "Leçons", 1], ["streak", "Série", 1], ["errors", "Erreurs", 1], ["syncs", "Synchros", 1]].map(function (c) { return '<th data-k="' + c[0] + '" class="' + (c[2] ? "num" : "") + '">' + c[1] + '</th>'; }).join("") + '</tr></thead><tbody id="tb"></tbody></table></div></section>';
+
+    var sortK = "last", dir = -1;
+    function rows() {
+      var q = (document.getElementById("q").value || "").toLowerCase();
+      var list = d.users.filter(function (u) { return !q || u.name.toLowerCase().indexOf(q) >= 0; }).sort(function (a, b) { var x = a[sortK], y = b[sortK]; return (x > y ? 1 : x < y ? -1 : 0) * dir; });
+      document.getElementById("tb").innerHTML = list.map(function (u) { var on = Date.now() - u.last < 864e5;
+        return '<tr><td><span class="dot' + (on ? " on" : "") + '"></span><b>' + esc(u.name) + '</b></td><td>' + ago(u.last) + '</td><td>' + fmtD(u.created) + '</td><td><span class="tag">' + esc(u.level) + '</span></td><td>' + esc(u.goal) + '</td><td class="num">' + fmtN(u.xp) + '</td><td class="num">' + u.lessons + '</td><td class="num">' + u.streak + ' j</td><td class="num">' + u.errors + '</td><td class="num">' + u.syncs + '</td></tr>'; }).join("") || '<tr><td colspan="10" class="empty">Aucun compte.</td></tr>';
+    }
+    document.querySelectorAll("th[data-k]").forEach(function (th) { th.onclick = function () { var k = th.dataset.k; dir = sortK === k ? -dir : (k === "name" || k === "level" || k === "goal" ? 1 : -1); sortK = k; rows(); }; });
+    document.getElementById("q").oninput = rows; rows();
+    document.getElementById("rf").onclick = function () { load(code); };
+    document.getElementById("lo").onclick = function () { try { sessionStorage.removeItem("spk-admin"); } catch (e) {} login(); };
+    document.querySelectorAll("[data-tip]").forEach(function (el) {
+      el.onmouseenter = function () { tip.textContent = el.dataset.tip; tip.style.opacity = 1; };
+      el.onmousemove = function (e) { tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (e.clientY - 34) + "px"; };
+      el.onmouseleave = function () { tip.style.opacity = 0; };
+      el.ontouchstart = function (e) { var t = e.touches[0]; tip.textContent = el.dataset.tip; tip.style.opacity = 1; tip.style.left = Math.max(8, Math.min(t.clientX - 60, innerWidth - 180)) + "px"; tip.style.top = (t.clientY - 44) + "px"; };
+    });
+    document.addEventListener("touchend", function () { setTimeout(function () { tip.style.opacity = 0; }, 1200); }, { passive: true });
+  }
+
+  var saved = null; try { saved = sessionStorage.getItem("spk-admin"); } catch (e) {}
+  saved ? load(saved) : login();
+})();
+</script>
+</body>
+</html>
