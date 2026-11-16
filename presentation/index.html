@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#4f46e5">
 <meta property="og:title" content="Speakly · Apprendre l'anglais de zéro au niveau bilingue">
 <meta property="og:description" content="140 leçons de A0 à C2 et une préparation complète à l'oral d'anglais du DSCG. Gratuit, sans compte, hors ligne.">
-<meta property="og:image" content="https://tauwni.github.io/Speakly/docs/images/banner.png">
-<meta property="og:url" content="https://tauwni.github.io/Speakly/presentation/">
+<meta property="og:image" content="https://speaklyyy.netlify.app/docs/images/banner.png">
+<meta property="og:url" content="https://speaklyyy.netlify.app/presentation/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../icon-512.png">
@@ -21,7 +21,7 @@
   --pri:#4f46e5;--pri2:#7c3aed;--pri-soft:#eef0ff;--ok:#059669;--ok-soft:#e7f8f1;--ko:#e11d48;--gold:#f59e0b;
   --shadow:0 1px 2px rgba(15,23,42,.04),0 10px 30px rgba(15,23,42,.07);--r:24px;
 }
-@media (prefers-color-scheme:dark){:root{
+@media (prefers-color-scheme:dark){header.top{background:rgba(11,13,23,.86)}:root{
   --bg:#0b0d17;--surface:#151826;--surface2:#1d2133;--ink:#eef0f8;--ink2:#a3abc2;--muted:#6b7390;--line:#262a3e;
   --pri-soft:#232650;--ok-soft:#0f2a22;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
 }}
@@ -30,12 +30,13 @@ html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
+img[src="../icon.svg"]{border-radius:24%;flex:none}
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 h1,h2,h3{margin:0;letter-spacing:-.03em;line-height:1.12}
 .ic{flex:none}
 
 /* barre du haut */
-header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
+header.top{position:sticky;top:0;z-index:20;background:rgba(247,248,252,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
 header.top.scrolled{border-color:var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.03em}
@@ -221,7 +222,7 @@ footer a:hover{color:var(--pri)}
 
 <header class="top" id="top">
   <div class="wrap nav">
-    <a class="brand" href="#"><svg width="34" height="34"><use href="#logo"/></svg>Speakly</a>
+    <a class="brand" href="#"><img src="../icon.svg" width="34" height="34" alt="">Speakly</a>
     <nav class="links">
       <a href="#fonctionnalites">Fonctionnalités</a>
       <a href="#parcours">Parcours</a>
@@ -426,7 +427,7 @@ footer a:hover{color:var(--pri)}
   <section style="padding-top:20px">
     <div class="wrap">
       <div class="final reveal">
-        <svg width="72" height="72" style="margin:0 auto;display:block"><use href="#logo"/></svg>
+        <img src="../icon.svg" width="72" height="72" alt="" style="margin:0 auto;display:block">
         <h2>Ta première leçon prend 10 minutes</h2>
         <p>Passe le test de niveau, et commence exactement là où tu en es.</p>
         <div class="cta"><a class="btn" href="../"><svg class="ic" width="18" height="18" fill="currentColor"><use href="#i-play"/></svg>Ouvrir Speakly</a><a class="btn ghost" href="https://github.com/Tauwni/Speakly"><svg class="ic" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gh"/></svg>Voir le code</a></div>
@@ -437,7 +438,7 @@ footer a:hover{color:var(--pri)}
 
 <footer>
   <div class="wrap row">
-    <a class="brand" href="#"><svg width="28" height="28"><use href="#logo"/></svg>Speakly</a>
+    <a class="brand" href="#"><img src="../icon.svg" width="28" height="28" alt="">Speakly</a>
     <span>Apprendre l'anglais de A0 à C2 · Préparation DSCG UE6</span>
     <span><a href="../">Application</a> · <a href="https://github.com/Tauwni/Speakly">GitHub</a></span>
   </div>

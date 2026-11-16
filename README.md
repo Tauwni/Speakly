@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://tauwni.github.io/Speakly/"><img src="https://img.shields.io/badge/Essayer-tauwni.github.io%2FSpeakly-4f46e5?style=for-the-badge" alt="Essayer l'application"></a>
-  <a href="https://tauwni.github.io/Speakly/presentation/"><img src="https://img.shields.io/badge/Page%20de%20pr%C3%A9sentation-d%C3%A9couvrir-7c3aed?style=for-the-badge" alt="Page de présentation"></a>
+  <a href="https://speaklyyy.netlify.app/"><img src="https://img.shields.io/badge/Essayer-speaklyyy.netlify.app-4f46e5?style=for-the-badge" alt="Essayer l'application"></a>
+  <a href="https://speaklyyy.netlify.app/presentation/"><img src="https://img.shields.io/badge/Page%20de%20pr%C3%A9sentation-d%C3%A9couvrir-7c3aed?style=for-the-badge" alt="Page de présentation"></a>
 </p>
 
 <p align="center">
@@ -84,13 +84,15 @@ Un mode dédié à l'épreuve **UE6 Anglais des affaires** du DSCG. Il s'active 
 
 ## Installer l'application
 
-Ouvre **[tauwni.github.io/Speakly](https://tauwni.github.io/Speakly/)** puis :
+Ouvre **[speaklyyy.netlify.app](https://speaklyyy.netlify.app/)** puis :
 
 - **iPhone (Safari)** : bouton Partager, puis « Sur l'écran d'accueil ».
 - **Android (Chrome)** : menu ⋮, puis « Installer l'application ».
 - **Ordinateur (Chrome ou Edge)** : icône d'installation dans la barre d'adresse.
 
 La progression est enregistrée sur l'appareil : elle ne passe par aucun serveur.
+
+> Adresse de secours : [tauwni.github.io/Speakly](https://tauwni.github.io/Speakly/) (même application, hébergée par GitHub Pages). La progression n'est pas partagée entre les deux adresses.
 
 ## Lancer le projet en local
 

@@ -1,8 +1,23 @@
 [build]
   publish = "."
-  command = "echo static"
 
+# Toujours revalider les fichiers de l'appli : une mise à jour est visible tout de suite
 [[headers]]
-  for = "/sw.js"
+  for = "/*"
   [headers.values]
     Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/presentation/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/docs/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[redirects]]
+  from = "/presentation"
+  to = "/presentation/"
+  status = 301
