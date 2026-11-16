@@ -3,6 +3,7 @@
 // combinée à un secret serveur (PEPPER). Session par jeton aléatoire envoyé dans l'en-tête Authorization.
 
 const ORIGINS = ["https://speaklyyy.netlify.app", "https://tauwni.github.io", "http://localhost:8455", "http://localhost:8431", "http://127.0.0.1:8455"];
+const TTS_VOICES = ["thalia", "apollo", "pandora", "draco", "luna", "orion"], TTS_DAILY = 4000;
 const MAX_FAILS = 5, LOCK_MS = 15 * 60 * 1000, MAX_DATA = 900_000, ITER = 20000;
 const enc = new TextEncoder();
 const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
@@ -90,6 +91,24 @@ export default {
       const me = await auth(req, env);
       if (!me) return json(req, { error: "Session expirée : reconnecte-toi" }, 401);
 
+      if (path === "/api/tts" && req.method === "GET") {
+        const q = new URL(req.url).searchParams, text = String(q.get("t") || "").replace(/\s+/g, " ").trim().slice(0, 600);
+        const voice = TTS_VOICES.includes(q.get("v")) ? q.get("v") : TTS_VOICES[0];
+        if (!text) return json(req, { error: "Texte vide" }, 400);
+        const k = `tts/${voice}/${await sha(text)}.mp3`, head = { "Content-Type": "audio/mpeg", "Cache-Control": "private, max-age=31536000, immutable", ...cors(req) };
+        const hit = await env.AUDIO.get(k);
+        if (hit) return new Response(hit.body, { headers: head });
+        const day = new Date().toISOString().slice(0, 10);
+        const u = await env.DB.prepare("SELECT n FROM tts_usage WHERE day = ?").bind(day).first();
+        if (u && u.n >= TTS_DAILY) return json(req, { error: "Limite quotidienne de voix atteinte" }, 429);
+        const out = await env.AI.run("@cf/deepgram/aura-2-en", { text, speaker: voice, encoding: "mp3" });
+        const buf = out instanceof ReadableStream ? await new Response(out).arrayBuffer() : out && out.audio ? Uint8Array.from(atob(out.audio), c => c.charCodeAt(0)).buffer : out instanceof ArrayBuffer ? out : await new Response(out).arrayBuffer();
+        if (!buf || buf.byteLength < 200) return json(req, { error: "Synthèse indisponible" }, 502);
+        await env.AUDIO.put(k, buf, { httpMetadata: { contentType: "audio/mpeg" } });
+        await env.DB.prepare("INSERT INTO tts_usage (day, n) VALUES (?, 1) ON CONFLICT(day) DO UPDATE SET n = n + 1").bind(day).run();
+        return new Response(buf, { headers: head });
+      }
+
       if (path === "/api/progress" && req.method === "GET") {
         const u = await env.DB.prepare("SELECT data, version, updated FROM users WHERE id = ?").bind(me.id).first();
         return json(req, { name: me.name, data: u.data, version: u.version, updated: u.updated });
@@ -126,7 +145,7 @@ export default {
       }
       return json(req, { error: "Introuvable" }, 404);
     } catch (e) {
-      return json(req, { error: "Erreur du serveur, réessaie dans un instant" }, 500);
+      return json(req, { error: "Erreur du serveur, réessaie dans un instant", detail: String(e && e.message || e).slice(0, 200) }, 500);
     }
   },
   // ménage quotidien : sessions inactives depuis plus de 180 jours

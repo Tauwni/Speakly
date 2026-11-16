@@ -18,7 +18,7 @@
 <p align="center">
   <b>Speakly</b> est une application pour apprendre l'anglais en partant de zéro jusqu'au niveau quasi bilingue,<br>
   avec un mode complet pour préparer l'oral d'anglais du <b>DSCG</b>.<br>
-  Elle fonctionne dans le navigateur, sur téléphone comme sur ordinateur, sans compte et même hors ligne.
+  Elle fonctionne dans le navigateur, sur téléphone comme sur ordinateur, avec un compte gratuit qui sauvegarde ta progression, et même hors ligne.
 </p>
 
 ---
@@ -52,15 +52,16 @@
 | **11 types d'exercices** | QCM, écoute, dictée de mots et de phrases, traduction, phrases à remettre dans l'ordre, phrases à trous, association de paires, compréhension, lecture, prononciation au micro. |
 | **Révisions espacées** | Chaque mot revient au bon moment (1, 3, 7, 16, 35 jours…) pour être retenu sur le long terme. |
 | **Onglet Erreurs** | Chaque faute est gardée avec ta réponse et la bonne réponse, classée par thème ou par leçon. Elle est corrigée quand tu la réussis deux fois de suite. |
-| **Compte et synchronisation** | Facultatif : un pseudo et un code secret à 6 chiffres suffisent. La progression est sauvegardée en ligne et retrouvée sur tous tes appareils. |
+| **Compte et synchronisation** | Un pseudo et un code secret à 6 chiffres, demandés à l'ouverture. La progression est sauvegardée en ligne et retrouvée sur tous tes appareils. |
 | **Routine quotidienne** | Check-list du jour : série en VO, oral à voix haute, podcast, lecture, séance du jour, révisions. Séries et podcasts conseillés par niveau, carnet de mots ajoutés aux révisions. |
+| **Voix naturelles** | Quatre voix neuronales au choix (britanniques et américaines) au lieu de la voix robotique du navigateur. |
 | **Reprise des sessions** | Tu quittes une leçon, un examen ou un entraînement : tu reprends plus tard exactement à la même question. |
 | **Pratique** | Séance du jour, 110 verbes irréguliers, conjugaison sur 11 temps, histoires à écouter, dialogues de situation, paires de sons, nombres et heures, « corrige l'erreur », phrasal verbs, expressions idiomatiques, faux amis. |
 | **Correction de l'écrit** | 14 sujets de rédaction notés sur 20 : fautes soulignées et expliquées en français, conseils et corrigé modèle. Fonctionne hors ligne, avec une analyse complémentaire en ligne facultative. |
 | **Examens et certificats** | Un examen de 20 questions par niveau, certificat à partir de 80 %. |
 | **Ressources** | Grammaire, lexique de plus de 1 600 mots, tableau des verbes irréguliers, guide de prononciation, référentiels CECRL et DSCG. |
 | **Progrès** | Série de jours, XP, objectif quotidien, précision, maîtrise par niveau, 24 badges. |
-| **Confort** | Mode sombre automatique, installation sur l'écran d'accueil, fonctionnement hors ligne, aucun compte ni publicité. |
+| **Confort** | Mode sombre automatique, installation sur l'écran d'accueil, fonctionnement hors ligne, aucune publicité. |
 
 ## Le parcours
 
@@ -97,7 +98,7 @@ Ouvre **[speaklyyy.netlify.app](https://speaklyyy.netlify.app/)** puis :
 - **Android (Chrome)** : menu ⋮, puis « Installer l'application ».
 - **Ordinateur (Chrome ou Edge)** : icône d'installation dans la barre d'adresse.
 
-Sans compte, la progression reste sur l'appareil. Avec un compte (pseudo + code secret), elle est aussi sauvegardée en ligne et synchronisée entre tes appareils.
+À la première ouverture, connecte-toi ou crée ton compte (un pseudo et un code secret à 6 chiffres) : ta progression est sauvegardée en ligne et synchronisée entre tes appareils.
 
 > Adresse de secours : [tauwni.github.io/Speakly](https://tauwni.github.io/Speakly/) (même application, hébergée par GitHub Pages). La progression n'est pas partagée entre les deux adresses.
 
@@ -126,7 +127,8 @@ Speakly/
 ├── dscg.js             Mode Préparation DSCG et référentiel CECRL
 ├── routine.js          Routine quotidienne (séries, oral, écoute, carnet de mots)
 ├── dcgmode.js          Mode Préparation DCG et écran Réforme 2026
-├── sync.js             Compte et synchronisation de la progression
+├── sync.js             Compte (connexion obligatoire) et synchronisation
+├── voice.js            Voix naturelles et choix de la voix
 ├── server/             Serveur de comptes (Cloudflare Worker + base D1)
 ├── data/
 │   ├── core.js         Moteur de contenu des leçons
@@ -144,5 +146,5 @@ Speakly/
 
 - Le format de l'épreuve et le programme DSCG sont présentés d'après l'arrêté du 4 août 2025 (Bulletin officiel n° 32 du 28 août 2025), tel que repris par des sites de préparation. Vérifie les modalités de ta session sur le texte officiel.
 - Les articles du mode DSCG sont des textes d'entraînement rédigés pour l'application, pas de vrais articles de presse.
-- L'audio utilise la synthèse vocale du navigateur. La reconnaissance vocale et l'enregistrement dépendent du navigateur et de l'autorisation du micro.
+- Les voix sont des voix neuronales naturelles (Deepgram Aura, via Cloudflare Workers AI), générées une fois puis gardées en mémoire ; hors ligne, la voix de l'appareil prend le relais. La reconnaissance vocale et l'enregistrement dépendent du navigateur et de l'autorisation du micro.
 - La correction en ligne, facultative, envoie le texte au service LanguageTool. Elle peut être désactivée sous le bouton « Corriger mon texte ».

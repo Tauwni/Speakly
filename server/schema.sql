@@ -17,3 +17,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   last_seen INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id);
+CREATE TABLE IF NOT EXISTS tts_usage (
+  day TEXT PRIMARY KEY,
+  n INTEGER NOT NULL DEFAULT 0
+);

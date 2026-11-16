@@ -1,11 +1,23 @@
 // ===== Routine quotidienne : séries en VO, oral, écoute, carnet de mots =====
+const lessonToday = () => S.dailyDone === today() || Object.values(S.done).some(d => d && d.date === today() && !d.skipped);
+const journalId = () => "journal-" + today();
 const ROUTINE = [
-  { id: "serie", icon: "play", t: "Regarder une série ou un film en VO", d: "20 minutes, sous-titres en anglais" },
-  { id: "speak", icon: "mic", t: "Parler anglais à voix haute", d: "10 minutes : lire, répéter, te raconter ta journée" },
-  { id: "listen", icon: "headphones", t: "Écouter un podcast ou une vidéo", d: "10 minutes, dans les transports par exemple" },
-  { id: "read", icon: "doc", t: "Lire un article en anglais", d: "Presse économique ou sujet qui te plaît" },
-  { id: "daily", icon: "bolt", t: "Faire la séance du jour", d: "Coché automatiquement", auto: () => S.dailyDone === today(), go: "startDaily()" },
-  { id: "review", icon: "brain", t: "Réviser mes mots", d: "Coché quand toutes les révisions du jour sont faites", auto: () => Object.keys(S.srs).length > 0 && dueCards().length === 0, go: "go('review')" }
+  { id: "daily", icon: "bolt", t: "Faire une leçon ou la séance du jour", d: "Coché automatiquement", auto: lessonToday, go: "startDaily()" },
+  { id: "review", icon: "brain", t: "Réviser mes mots", d: "Coché quand les révisions du jour sont faites", auto: () => Object.keys(S.srs).length > 0 && dueCards().length === 0, go: "go('review')" },
+  { id: "serie", icon: "play", t: "Regarder un épisode ou un film en VO", d: "Sous-titres en anglais, jamais en français" },
+  { id: "speak", icon: "mic", t: "Parler 10 minutes à voix haute", d: "Répéter des répliques, lire un dialogue, raconter ta journée" },
+  { id: "write", icon: "fix", t: "Écrire quelques phrases en anglais", d: "3 à 5 phrases sur ta journée, corrigées automatiquement", auto: () => !!(S.writing[journalId()] && S.writing[journalId()].done === today()), go: "openJournal()" },
+  { id: "listen", icon: "headphones", t: "Écouter un podcast", d: "Dans les transports ou en marchant" },
+  { id: "read", icon: "doc", t: "Lire en anglais", d: "Un article, quelques pages d'un livre, un sujet qui te plaît" }
+];
+const STUDIES = [
+  ["Beaucoup d'anglais que tu comprends presque entièrement", "On progresse surtout en écoutant et en lisant un anglais un peu au-dessus de son niveau, en grande quantité. D'où l'épisode quotidien en VO.", "Krashen, The Input Hypothesis, 1985"],
+  ["Sous-titres en anglais, pas en français", "Les sous-titres dans la langue étudiée aident à reconnaître les mots à l'oral ; les sous-titres en français, eux, gênent cet apprentissage.", "Mitterer et McQueen, PLoS ONE, 2009"],
+  ["Se tester plutôt que relire", "Chercher la réponse de mémoire fixe bien mieux que relire. C'est le principe des exercices et des révisions de l'appli.", "Roediger et Karpicke, Psychological Science, 2006"],
+  ["Espacer les révisions", "Revoir un mot après 1 jour, puis 3, puis 7… retient beaucoup mieux que tout réviser d'un coup.", "Cepeda et al., Psychological Bulletin, 2006"],
+  ["Parler et écrire, pas seulement comprendre", "Produire oblige à remarquer ce qui manque : c'est ce qui transforme le vocabulaire passif en vocabulaire utilisable.", "Swain, hypothèse de l'output, 1985"],
+  ["Échanger avec de vrais interlocuteurs", "La conversation, avec ses incompréhensions et ses reformulations, accélère l'acquisition. Une fois par semaine suffit pour commencer.", "Long, hypothèse de l'interaction, 1996"],
+  ["Un peu chaque jour plutôt que beaucoup une fois", "Plusieurs séances courtes réparties dans la semaine donnent de meilleurs résultats qu'une seule longue séance.", "Effet d'espacement, Cepeda et al., 2006"]
 ];
 const SHOWS = [
   { lv: "A0–A1", list: [["Extra English", "Série conçue pour les apprenants, très lente et claire"], ["Peppa Pig", "Phrases courtes, accent britannique, idéal pour démarrer"]] },
@@ -15,7 +27,12 @@ const SHOWS = [
   { lv: "C1–C2", list: [["Succession", "Gouvernance, conseil d'administration, rachats", 1], ["Billions", "Marchés financiers et fonds d'investissement", 1], ["Industry", "Banque d'investissement à Londres", 1], ["The Big Short (film)", "Crise financière de 2008", 1]] }
 ];
 const PODCASTS = [["6 Minute English (BBC)", "Six minutes sur un sujet du quotidien, avec le vocabulaire expliqué", "A2–B1"], ["Business English Pod", "Situations professionnelles : réunions, négociations, e-mails", "B1–B2"], ["Planet Money (NPR)", "L'économie racontée simplement", "B2–C1"], ["The Economist Podcasts", "Actualité économique, idéal pour le DCG et le DSCG", "C1"]];
-const RT = () => (S.routine = S.routine || { on: ["serie", "speak", "listen", "daily", "review"], log: {}, words: [] });
+const RT = () => { S.routine = S.routine || { on: ["daily", "review", "serie", "speak", "write"], log: {}, words: [], v: 2 };
+  if (S.routine.v !== 2) { if (!S.routine.on.includes("write")) S.routine.on.push("write"); S.routine.v = 2; }
+  return S.routine; };
+function openJournal() {
+  writeTask({ id: journalId(), kicker: "Journal du jour", title: "Ma journée en anglais", task: "Écris 3 à 5 phrases sur ta journée : ce que tu as fait, ce que tu as ressenti, ce que tu prévois demain. Réutilise les mots appris récemment.", min: 30, keys: ["today", "because", "tomorrow"], model: "Today I had a busy day. In the morning I went to class and we studied the balance sheet. I found it difficult because there were many new words. In the evening I watched an episode of a series in English with English subtitles. Tomorrow I am going to revise my vocabulary and practise speaking for ten minutes.", back: [app.querySelector(".routine-page") ? "routine" : "home"] });
+}
 const rtItems = () => ROUTINE.filter(r => RT().on.includes(r.id));
 const rtDone = (r, d = today()) => r.auto && d === today() ? r.auto() : (RT().log[d] || []).includes(r.id);
 function rtDayFull(d) { const it = rtItems(); return it.length && it.every(r => (RT().log[d] || []).includes(r.id) || (d === today() && r.auto && r.auto())); }
@@ -41,10 +58,13 @@ SCREENS.routine = function () {
   app.innerHTML = appbar() + pracBack() + `<div class="routine-page"><h2>Ma routine anglaise</h2><p class="muted" style="margin-top:6px">L'appli te donne la structure. Les séries, l'oral et l'écoute te donnent l'habitude d'entendre et de parler : les deux ensemble, c'est ce qui fait vraiment progresser.</p>
    <div class="grid2"><div class="stat">${icon("flame", 20)}<b>${rtStreak()}</b><span>jours de routine complète d'affilée</span></div><div class="stat"><div class="week7">${week.map(w => `<span class="${w.ok ? "ok" : w.part ? "part" : ""}">${w.l}</span>`).join("")}</div><span>les 7 derniers jours</span></div></div>
    ${routineCard()}
-   <div class="card"><h3>Pourquoi regarder des séries et parler ?</h3>
-    <p style="margin:8px 0 0">Les leçons t'apprennent les règles et les mots. Mais pour comprendre l'anglais parlé à vitesse normale et oser parler, il faut beaucoup d'exposition et de pratique : c'est ce que l'appli seule ne peut pas remplacer.</p>
-    ${[["Sous-titres en anglais, jamais en français", "Tu associes ce que tu entends à ce que tu lis. En dessous de A2, commence par des épisodes courts que tu connais déjà."], ["Le shadowing", "Mets en pause après une réplique et répète-la à voix haute en imitant l'intonation. C'est l'exercice d'oral le plus efficace seul."], ["Note 5 mots par épisode", "Ajoute-les à ton carnet ci-dessous : ils rejoignent tes révisions espacées."], ["Parle tous les jours, même seul", "Raconte ta journée en anglais, lis un dialogue de l'appli à voix haute, ou enregistre-toi pendant un oral blanc."]].map(([t, d]) => `<div class="issue"><span class="num">${icon("check", 14)}</span><div><b>${t}</b><div class="muted small">${d}</div></div></div>`).join("")}
-    <div class="row" style="gap:10px;margin-top:12px"><button class="btn sec" style="margin:0" onclick="go('dialogues')">${icon("chat", 18)}Lire un dialogue</button><button class="btn sec" style="margin:0" onclick="startPron()">${icon("mic", 18)}Prononciation</button></div></div>
+   <div class="card"><h3>Ce que disent les études</h3>
+    <p class="muted small" style="margin-top:4px">Ta routine est construite sur ce qui fait le plus progresser d'après la recherche sur l'apprentissage des langues.</p>
+    ${STUDIES.map(([t, d, src]) => `<div class="issue"><span class="num">${icon("check", 14)}</span><div><b>${t}</b><div class="muted small">${d}</div><div class="src">${src}</div></div></div>`).join("")}</div>
+   <div class="card"><h3>Ta journée idéale : 45 à 60 minutes</h3>
+    ${[["10 à 15 min", "Une leçon ou la séance du jour, puis tes révisions"], ["20 à 45 min", "Un épisode de série en VO, ou un film un autre jour"], ["10 min", "Parler : répéter des répliques de l'épisode, lire un dialogue"], ["5 min", "Écrire quelques phrases dans ton journal"], ["1 fois par semaine", "Une vraie conversation : un échange linguistique, un cours, un collègue anglophone"]].map(([t, d]) => `<div class="vocab"><span class="tag" style="flex:none">${t}</span><div class="fr" style="flex:1">${d}</div></div>`).join("")}
+    <p class="muted small" style="margin-bottom:0">Pas le temps ? Garde au moins la leçon et les révisions : la régularité compte plus que la durée.</p>
+    <div class="row" style="gap:10px;margin-top:12px"><button class="btn sec" style="margin:0" onclick="go('dialogues')">${icon("chat", 18)}Lire un dialogue</button><button class="btn sec" style="margin:0" onclick="openJournal()">${icon("fix", 18)}Mon journal</button></div></div>
    <div class="card" id="carnet"><h3>Mon carnet de mots</h3><p class="muted small" style="margin-top:4px">Un mot entendu dans une série ? Ajoute-le : il reviendra dans tes révisions.</p>
     <input class="txt" id="cw-en" placeholder="Mot ou expression en anglais" autocapitalize="off"><div style="height:8px"></div><input class="txt" id="cw-fr" placeholder="Traduction en français"><p class="msg" id="cw-m"></p>
     <button class="btn sec" id="cw-add">${icon("check", 18)}Ajouter à mes révisions</button>

@@ -76,16 +76,16 @@ async function pullNow(rerender) {
   } catch (e) { SYNC.state = e.offline ? "offline" : "err"; SYNC.err = e.message; if (e.status === 401) expire(); }
   syncBadge();
 }
-function expire() { AUTH = null; authSave(); SYNC.state = "off"; toast("Ta session a expiré : reconnecte-toi pour synchroniser."); }
+function expire() { AUTH = null; authSave(); SYNC.state = "off"; go("account", "login"); toast("Ta session a expiré : reconnecte-toi."); }
 window.onSaved = () => queueSync();
 function syncBadge() { const b = document.querySelector(".chip.acc"); if (b) b.className = "chip acc " + SYNC.state; }
 
 // ----- écran Compte -----
 const pinInput = (id, ph) => `<input class="txt pin" id="${id}" type="password" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" placeholder="${ph}">`;
 SCREENS.account = function (tab) {
-  setNav(S.level ? "stats" : null);
   const gate = needGate();
-  const back = S.level ? backBtn("stats", "Progrès") : gate ? `<div class="gate-head">${logo(64)}<h1>Speakly</h1><p class="muted">De grand débutant à quasi bilingue.</p></div>` : `<button class="backlink" onclick="go('welcome')">${icon("back", 17)}Accueil</button>`;
+  setNav(S.level && !gate ? "stats" : null);
+  const back = gate ? `<div class="gate-head">${logo(64)}<h1>Speakly</h1><p class="muted">De grand débutant à quasi bilingue.</p></div>` : S.level ? backBtn("stats", "Progrès") : `<button class="backlink" onclick="go('welcome')">${icon("back", 17)}Accueil</button>`;
   if (AUTH) {
     const last = AUTH.last ? new Date(AUTH.last).toLocaleString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "jamais";
     app.innerHTML = (S.level ? appbar() : "") + back + `<h2>Mon compte</h2>
@@ -109,15 +109,15 @@ SCREENS.account = function (tab) {
       AUTH = null; authSave(); try { localStorage.removeItem("speakly2"); } catch (e) {} location.reload();
     };
     $("#del").onclick = async () => {
-      const pin = prompt("Pour supprimer définitivement ton compte et la progression enregistrée en ligne, tape ton code secret :");
+      const pin = prompt("Pour supprimer définitivement ton compte et toute ta progression, tape ton code secret :");
       if (!pin) return;
-      try { await api("/account", "DELETE", { pin }); AUTH = null; authSave(); go(S.level ? "home" : "welcome"); toast("Compte supprimé. Ta progression reste sur cet appareil."); } catch (e) { alert(e.message); }
+      try { await api("/account", "DELETE", { pin }); AUTH = null; authSave(); try { localStorage.removeItem("speakly2"); } catch (e) {} location.reload(); } catch (e) { alert(e.message); }
     };
     return;
   }
   const mode = tab === "signup" ? "signup" : "login";
-  app.innerHTML = (S.level ? appbar() : "") + back + `<h2>${mode === "signup" ? "Créer mon compte" : "Se connecter"}</h2>
-   <p class="muted" style="margin-top:6px">${mode === "signup" ? (gate ? "Ton compte sauvegarde ta progression en ligne : tu la retrouves sur ton téléphone comme sur ton ordinateur." : "Un compte sauvegarde ta progression en ligne pour la retrouver sur tous tes appareils. Ta progression actuelle est conservée.") : "Retrouve ta progression sur cet appareil avec ton pseudo et ton code secret."}</p>
+  app.innerHTML = (S.level && !gate ? appbar() : "") + back + `<h2>${mode === "signup" ? "Créer mon compte" : "Se connecter"}</h2>
+   <p class="muted" style="margin-top:6px">${mode === "signup" ? (gate ? "Ton compte sauvegarde ta progression en ligne : tu la retrouves sur ton téléphone comme sur ton ordinateur." : "Un compte sauvegarde ta progression en ligne pour la retrouver sur tous tes appareils. Ta progression actuelle est conservée.") : "Connecte-toi avec ton pseudo et ton code secret pour retrouver ta progression."}${gate && S.level ? " La progression déjà faite sur cet appareil sera ajoutée à ton compte." : ""}</p>
    <div class="toggle" id="mt"><button data-m="login" class="${mode === "login" ? "on" : ""}">Se connecter</button><button data-m="signup" class="${mode === "signup" ? "on" : ""}">Créer un compte</button></div>
    <div class="card">
     <p class="small muted" style="margin:0 0 6px">Pseudo</p><input class="txt" id="nm" autocomplete="username" autocapitalize="off" maxlength="24" placeholder="ex. lea.martin" value="${esc(mode === "signup" && S.name && S.name !== "toi" ? S.name : "")}">
@@ -125,8 +125,7 @@ SCREENS.account = function (tab) {
     ${mode === "signup" ? `<div style="height:10px"></div>${pinInput("pn2", "Confirme ton code")}<p class="muted small" style="margin-bottom:0">Choisis un code que tu retiendras : il te sera demandé à chaque connexion. Il n'est pas récupérable.</p>` : ""}
     <p class="msg" id="msg"></p>
     <button class="btn" id="go">${mode === "signup" ? "Créer mon compte" : "Se connecter"}</button></div>
-   ${gate ? `<button class="btn ghost" id="skip">Continuer sans compte</button><p class="muted small center">Sans compte, ta progression reste uniquement sur cet appareil. Tu pourras créer un compte plus tard depuis l'onglet Progrès.</p>` : ""}`;
-  if ($("#skip")) $("#skip").onclick = () => { S.skipAuth = true; save(); go("welcome"); };
+   ${gate ? `<p class="muted small center">${mode === "login" ? "Pas encore de compte ? Choisis « Créer un compte » : c'est gratuit et il suffit d'un pseudo et d'un code." : "Un compte est nécessaire pour utiliser Speakly : ta progression est ainsi sauvegardée et jamais perdue."}</p>` : ""}`;
   $$("#mt button").forEach(b => b.onclick = () => go("account", b.dataset.m));
   const msg = t => { $("#msg").textContent = t; };
   $("#go").onclick = async () => {
@@ -155,8 +154,8 @@ SCREENS.account = function (tab) {
 };
 
 // ----- points d'entrée dans l'interface -----
-function needGate() { return !S.level && !AUTH && !S.skipAuth; }
-const _welcome = SCREENS.welcome;
-SCREENS.welcome = function () { if (needGate()) return SCREENS.account("signup"); return _welcome(); };
-go(S.level ? "home" : "welcome");
+// Connexion obligatoire : tant qu'on n'est pas connecté, tout écran renvoie vers la page de connexion
+function needGate() { return !AUTH; }
+const _go = go;
+go = function (p, ...a) { if (needGate() && p !== "account") return _go("account", "login"); return _go(p, ...a); };
 if (AUTH) { pullNow(true); addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pullNow(true); else if (SYNC.timer) { clearTimeout(SYNC.timer); pushNow(); } }); addEventListener("online", () => queueSync(300)); }

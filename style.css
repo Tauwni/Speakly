@@ -244,3 +244,8 @@ input[type=date].txt{font-size:16px;padding:12px 14px}
 .week7 span.part{background:var(--pri-soft);color:var(--pri)}.week7 span.ok{background:var(--ok);color:#fff}
 .gate-head{text-align:center;margin:24px 0 18px}.gate-head svg{margin:0 auto 10px;display:block}.gate-head h1{font-size:30px}.gate-head p{margin:6px 0 0}
 .center{text-align:center}
+
+.vchoice{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:10px 12px;margin-top:8px;cursor:pointer;font-family:inherit}
+.vchoice .tx{flex:1}.vchoice b{display:block}.vchoice small{color:var(--ink2);font-size:12.5px}
+.vchoice.on{border-color:var(--pri);background:var(--pri-soft)}
+.src{font-size:11.5px;color:var(--muted);margin-top:3px;font-style:italic}

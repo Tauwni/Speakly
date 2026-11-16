@@ -10,3 +10,10 @@ database_id = "e527270e-8c52-4ba7-a66e-87f81a8b6bd6"
 
 [triggers]
 crons = ["17 3 * * *"]
+
+[ai]
+binding = "AI"
+
+[[r2_buckets]]
+binding = "AUDIO"
+bucket_name = "speakly-audio"
