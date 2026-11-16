@@ -51,6 +51,7 @@
 | **11 types d'exercices** | QCM, écoute, dictée de mots et de phrases, traduction, phrases à remettre dans l'ordre, phrases à trous, association de paires, compréhension, lecture, prononciation au micro. |
 | **Révisions espacées** | Chaque mot revient au bon moment (1, 3, 7, 16, 35 jours…) pour être retenu sur le long terme. |
 | **Onglet Erreurs** | Chaque faute est gardée avec ta réponse et la bonne réponse, classée par thème ou par leçon. Elle est corrigée quand tu la réussis deux fois de suite. |
+| **Compte et synchronisation** | Facultatif : un pseudo et un code secret à 6 chiffres suffisent. La progression est sauvegardée en ligne et retrouvée sur tous tes appareils. |
 | **Reprise des sessions** | Tu quittes une leçon, un examen ou un entraînement : tu reprends plus tard exactement à la même question. |
 | **Pratique** | Séance du jour, 110 verbes irréguliers, conjugaison sur 11 temps, histoires à écouter, dialogues de situation, paires de sons, nombres et heures, « corrige l'erreur », phrasal verbs, expressions idiomatiques, faux amis. |
 | **Correction de l'écrit** | 14 sujets de rédaction notés sur 20 : fautes soulignées et expliquées en français, conseils et corrigé modèle. Fonctionne hors ligne, avec une analyse complémentaire en ligne facultative. |
@@ -90,7 +91,7 @@ Ouvre **[speaklyyy.netlify.app](https://speaklyyy.netlify.app/)** puis :
 - **Android (Chrome)** : menu ⋮, puis « Installer l'application ».
 - **Ordinateur (Chrome ou Edge)** : icône d'installation dans la barre d'adresse.
 
-La progression est enregistrée sur l'appareil : elle ne passe par aucun serveur.
+Sans compte, la progression reste sur l'appareil. Avec un compte (pseudo + code secret), elle est aussi sauvegardée en ligne et synchronisée entre tes appareils.
 
 > Adresse de secours : [tauwni.github.io/Speakly](https://tauwni.github.io/Speakly/) (même application, hébergée par GitHub Pages). La progression n'est pas partagée entre les deux adresses.
 
@@ -117,6 +118,8 @@ Speakly/
 ├── practice.js         Onglets Pratique et Ressources, examens, badges
 ├── check.js            Correction automatique de l'expression écrite
 ├── dscg.js             Mode Préparation DSCG et référentiel CECRL
+├── sync.js             Compte et synchronisation de la progression
+├── server/             Serveur de comptes (Cloudflare Worker + base D1)
 ├── data/
 │   ├── core.js         Moteur de contenu des leçons
 │   ├── a0.js … c2.js   Leçons par niveau

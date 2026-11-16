@@ -18,7 +18,7 @@ const norm = s => String(s).toLowerCase().replace(/[’‘]/g, "'").normalize("N
 let S;
 try { S = JSON.parse(localStorage.getItem("speakly2")); } catch (e) {}
 S = Object.assign({ name: "", level: null, done: {}, srs: {}, xp: 0, days: {}, streak: 0, best: 0, lastDay: null, answers: { ok: 0, ko: 0 }, goal: 30, unlocked: [], openLv: null, errors: {}, errView: { f: "todo", g: "cat" }, prac: {}, certs: {}, writing: {}, dailyDone: null }, S || {});
-const save = () => { try { localStorage.setItem("speakly2", JSON.stringify(S)); } catch (e) {} };
+const save = () => { try { localStorage.setItem("speakly2", JSON.stringify(S)); } catch (e) {} if (window.onSaved) window.onSaved(); };
 
 function addXP(n) {
   S.xp += n; const d = today();
@@ -70,7 +70,7 @@ function setNav(tab) {
 }
 const SCREENS = {};
 function go(p, ...a) { clearInterval(window.__tm); $$(".toast").forEach(t => p === "lesson" || t.remove()); try { speechSynthesis.cancel(); } catch (e) {} $$(".feedback").forEach(f => f.remove()); window.scrollTo(0, 0); SCREENS[p](...a); }
-const appbar = () => `<div class="appbar"><div class="brand">${logo(34)}Speakly</div><div class="chips"><span class="chip fire">${icon("flame", 17)}${S.streak}</span><span class="chip xp">${icon("bolt", 17)}${S.xp}</span></div></div>`;
+const appbar = () => `<div class="appbar"><div class="brand">${logo(34)}Speakly</div><div class="chips"><span class="chip fire">${icon("flame", 17)}${S.streak}</span><span class="chip xp">${icon("bolt", 17)}${S.xp}</span><button class="chip acc ${typeof SYNC !== "undefined" ? SYNC.state : "off"}" onclick="go('account')" aria-label="Mon compte">${icon("user", 17)}</button></div></div>`;
 
 // ===== Sessions en cours (reprise) =====
 const RES = () => (S.resume = S.resume || {});
@@ -112,7 +112,8 @@ SCREENS.welcome = function () {
     <h3 style="margin-top:18px">Ton objectif</h3>
     <div class="seg seg2" id="obj"><button data-o="0" class="${S.dscg ? "" : "on"}">Anglais général<small>Parcours complet</small></button><button data-o="1" class="${S.dscg ? "on" : ""}">Préparer le DSCG<small>UE6 Anglais des affaires</small></button></div>
     <button class="btn" id="test">${icon("target", 20)}Passer le test de niveau</button>
-    <button class="btn ghost" id="zero">Je pars de zéro</button></div>`;
+    <button class="btn ghost" id="zero">Je pars de zéro</button></div>
+   <div class="card row" style="cursor:pointer" onclick="go('account','login')"><div class="iconbtn">${icon("user")}</div><div style="flex:1"><b>${typeof AUTH !== "undefined" && AUTH ? `Connecté : ${esc(AUTH.name)}` : "J'ai déjà un compte"}</b><div class="muted small">${typeof AUTH !== "undefined" && AUTH ? "Ta progression sera sauvegardée en ligne" : "Retrouve ta progression avec ton pseudo et ton code secret"}</div></div>${icon("arrow", 20)}</div>`;
   $$("#goal button").forEach(b => b.onclick = () => { S.goal = +b.dataset.g; $$("#goal button").forEach(x => x.classList.toggle("on", x === b)); });
   $$("#obj button").forEach(b => b.onclick = () => { S.dscg = b.dataset.o === "1"; $$("#obj button").forEach(x => x.classList.toggle("on", x === b)); });
   const name = () => { S.name = $("#nm").value.trim() || "toi"; save(); };
@@ -617,7 +618,9 @@ SCREENS.stats = function () {
    <div class="card"><h3>Maîtrise par niveau</h3>${LEVELS.map(lv => { const ls = lessonsOf(lv.id), p = Math.round(ls.filter(x => S.done[x.id]).length / ls.length * 100);
      return `<div style="margin:14px 0 0"><div class="row between small"><b>${lv.id} · ${lv.name}</b><span class="muted">${p} %</span></div><div class="bar" style="margin-top:6px;height:8px"><i style="width:${p}%;background:${lv.color}"></i></div></div>`; }).join("")}</div>
    <div class="card"><h3>Vocabulaire</h3><p class="muted" style="margin-bottom:0">${seen} mots rencontrés, dont ${mastered} maîtrisés sur le long terme.</p></div>
-   ${statsExtra()}<div class="card"><div class="row">${icon("settings", 20)}<h3>Réglages</h3></div>
+   ${statsExtra()}
+   <div class="card row" style="cursor:pointer" onclick="go('account')"><div class="iconbtn">${icon("user")}</div><div style="flex:1"><b>${typeof AUTH !== "undefined" && AUTH ? `Mon compte : ${esc(AUTH.name)}` : "Créer un compte"}</b><div class="muted small">${typeof AUTH !== "undefined" && AUTH ? "Progression sauvegardée en ligne et synchronisée" : "Sauvegarde ta progression en ligne et retrouve-la sur tous tes appareils"}</div></div>${icon("arrow", 20)}</div>
+   <div class="card"><div class="row">${icon("settings", 20)}<h3>Réglages</h3></div>
     <p class="muted small">Objectif quotidien</p><div class="seg" id="goal">${[10, 30, 50, 100].map(g => `<button data-g="${g}" class="${g === S.goal ? "on" : ""}">${g}<small>XP</small></button>`).join("")}</div>
     <p class="muted small">Objectif</p><div class="seg seg2" id="obj"><button data-o="0" class="${S.dscg ? "" : "on"}">Anglais général</button><button data-o="1" class="${S.dscg ? "on" : ""}">Préparer le DSCG</button></div>
     <button class="btn sec" onclick="go('placement')">${icon("target", 18)}Repasser le test de niveau</button>

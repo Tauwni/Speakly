@@ -1,0 +1,12 @@
+name = "speakly-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "speakly"
+database_id = "e527270e-8c52-4ba7-a66e-87f81a8b6bd6"
+
+[triggers]
+crons = ["17 3 * * *"]

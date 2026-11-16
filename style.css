@@ -219,3 +219,15 @@ input[type=date].txt{font-size:16px;padding:12px 14px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;font-size:14px;font-weight:600;box-shadow:var(--shadow);transition:opacity .4s}
 .toast.out{opacity:0}
 .resume .bar i{background:var(--pri)}
+
+/* compte */
+.chip.acc{border:0;cursor:pointer;color:var(--ink2);position:relative;padding:7px 9px;font-family:inherit}
+.chip.acc:after{content:"";position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 2px var(--surface)}
+.chip.acc.off:after{display:none}
+.chip.acc.ok:after{background:var(--ok)}.chip.acc.busy:after{background:var(--gold)}.chip.acc.err:after,.chip.acc.offline:after{background:var(--ko)}
+.txt.pin{letter-spacing:.4em;font-weight:700;text-align:center;font-size:20px}
+.txt.pin::placeholder{letter-spacing:normal;font-weight:500;font-size:16px}
+.msg{color:var(--ko);font-weight:600;font-size:14px;min-height:1em;margin:10px 0 0}
+.msg:empty{display:none}
+.iconbtn.big-av{width:52px;height:52px;border-radius:16px;font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff}
+.sync-err,.sync-offline{color:var(--ko)}
