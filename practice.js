@@ -325,7 +325,7 @@ SCREENS.library = function () {
    ${tile("go('cefr')", "chart", "Référentiel CECRL", "Ce que l'on sait faire à chaque niveau, de A1 à C2")}
    ${tile("go('dcgInfo')", "award", "Référentiel DCG · UE12", "Écrit de 3 heures : synthèse, commentaire, document professionnel")}
    ${tile("go('dscgInfo')", "award", "Référentiel DSCG · UE6", "Format de l'épreuve, compétences et 7 thèmes")}
-   ${tile("go('reform')", "sparkle", "Réforme 2026 du DCG et du DSCG", "Calendrier et principaux changements")}`;
+   ${tile("go('reform')", "sparkle", "Réforme 2026 du DCG et du DSCG", "Ce qui change pour le DCG et le DSCG")}`;
 };
 function refScreen(title, desc, items, render, train) {
   setNav("library");

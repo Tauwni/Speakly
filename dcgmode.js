@@ -45,7 +45,6 @@ SCREENS.dcgInfo = function () {
 SCREENS.reform = function () {
   setNav("library"); const R = REFORM;
   app.innerHTML = appbar() + libBack() + `<h2>Réforme 2026</h2><p class="muted" style="margin-top:6px">Nouveaux programmes du DCG et du DSCG.</p>
-   <div class="card"><h3>Calendrier</h3>${R.dates.map(d => `<div class="vocab"><span class="tag" style="flex:none">${d[0]}</span><div class="fr" style="flex:1">${d[1]}</div></div>`).join("")}</div>
    <div class="card"><h3>DCG</h3>${R.dcg.map(x => `<p style="margin:8px 0 0" class="row">${icon("check", 16)}<span>${x}</span></p>`).join("")}<button class="btn sec" onclick="go('dcg')">Préparation DCG · UE12</button></div>
    <div class="card"><h3>DSCG</h3>${R.dscg.map(x => `<p style="margin:8px 0 0" class="row">${icon("check", 16)}<span>${x}</span></p>`).join("")}<button class="btn sec" onclick="go('dscg')">Préparation DSCG · UE6</button></div>
    <div class="card"><b>À vérifier</b><p class="muted small" style="margin-bottom:0">Synthèse établie d'après des sites de préparation qui citent l'arrêté du 4 août 2025. Les points « envisagés » (comme la dispense d'anglais du BTS CG) ne sont pas encore actés. Consulte le Bulletin officiel ou ton centre de formation pour ta session.</p></div>`;
