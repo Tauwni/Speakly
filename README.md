@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="https://tauwni.github.io/Speakly/"><img src="https://img.shields.io/badge/Essayer-tauwni.github.io%2FSpeakly-4f46e5?style=for-the-badge" alt="Essayer l'application"></a>
+  <a href="https://tauwni.github.io/Speakly/presentation/"><img src="https://img.shields.io/badge/Page%20de%20pr%C3%A9sentation-d%C3%A9couvrir-7c3aed?style=for-the-badge" alt="Page de présentation"></a>
 </p>
 
 <p align="center">
@@ -122,6 +123,7 @@ Speakly/
 │   └── dscg.js         Programme, thèmes et articles du DSCG
 ├── sw.js               Fonctionnement hors ligne
 ├── manifest.json       Installation sur l'écran d'accueil
+├── presentation/       Page de présentation du projet
 └── docs/images/        Images de ce README
 ```
 
