@@ -62,7 +62,9 @@ SCREENS.practice = function () {
    <div class="hero"><div class="eyebrow">${daily ? "Séance du jour terminée" : "Séance du jour"}</div><h2>Entraînement mixte</h2>
     <div class="meta">Révisions, erreurs à corriger, grammaire, conjugaison et écoute en une douzaine de questions.${daily ? "" : " Bonus de 15 XP une fois par jour."}</div>
     <button class="btn light" onclick="startDaily()">${icon("play", 18)}${daily ? "Refaire une séance" : "Lancer la séance"}</button></div>
-   ${S.dscg ? dscgTile() : ""}
+   ${S.dcg ? sec("Objectif DCG") + dcgTile() : ""}${S.dscg ? dscgTile() : ""}
+   ${sec("Au quotidien")}
+   ${tile("go('routine')", "check", "Ma routine anglaise", `Séries en VO, oral, écoute, carnet de mots · ${rtItems().filter(r => rtDone(r)).length} / ${rtItems().length} aujourd'hui`)}
    ${sec("Mémoire")}
    ${tile("go('review')", "brain", "Révisions espacées", due ? `${due} mot${due > 1 ? "s" : ""} à réviser aujourd'hui` : "Tout est à jour", due ? `<span class="tag ko">${due}</span>` : "")}
    ${sec("Verbes")}
@@ -82,7 +84,7 @@ SCREENS.practice = function () {
    ${tile("startDeck('ff')", "target", "Faux amis", `${FALSE_FRIENDS.length} pièges · ${pracInfo("ff")}`)}
    ${sec("Évaluation")}
    ${tile("go('exams')", "award", "Examens de fin de niveau", `${Object.keys(S.certs).length} certificat${Object.keys(S.certs).length > 1 ? "s" : ""} obtenu${Object.keys(S.certs).length > 1 ? "s" : ""}`)}
-   ${S.dscg ? "" : dscgTile()}`;
+   ${S.dcg || S.dscg ? "" : sec("Examens professionnels") + dcgTile()}${S.dscg ? "" : (S.dcg ? sec("Examens professionnels") : "") + tile("go('dscg')", "award", "Préparation DSCG · UE6", `Anglais des affaires : 7 thèmes, oraux blancs · ${dscgReady()} %`)}`;
 };
 
 // ----- verbes irréguliers -----
@@ -301,6 +303,7 @@ function startDaily() {
   const sents = src.flatMap(l => l.sentences); if (sents.length) { const s = pick(sents, 1)[0]; list.push({ type: "dictation", kicker: "Séance du jour · dictée", q: "Écris la phrase que tu entends", say: s.en, a: s.en }); }
   list.push(conjEx(), irrEx(pick(irrPool(), 1)[0], 0), numEx(pick([0, 2, 3], 1)[0]), fixEx(pick(atLv(FIXES, 0), 1)[0], 0));
   if (S.dscg) list.push(...dscgDailyEx());
+  if (S.dcg) list.push(...dcgDailyEx());
   while (list.filter(Boolean).length < 12) list.push(conjEx());
   runSet({ re: "startDaily()", key: "daily" + today(), title: "Séance du jour", mod: "daily", icon: "bolt", list: list.filter(Boolean), again: startDaily,
     done: () => { if (S.dailyDone === today()) return ""; S.dailyDone = today(); S.xp += 15; S.days[today()] = (S.days[today()] || 0) + 15; save(); return `<div class="card row"><div class="iconbtn">${icon("bolt")}</div><div><b>Bonus quotidien : +15 XP</b><div class="muted small">Reviens demain pour une nouvelle séance.</div></div></div>`; } });
@@ -320,7 +323,9 @@ SCREENS.library = function () {
    ${tile("go('refList','ff')", "target", "Faux amis", `${FALSE_FRIENDS.length} mots trompeurs`)}
    <div class="unit">Référentiels</div>
    ${tile("go('cefr')", "chart", "Référentiel CECRL", "Ce que l'on sait faire à chaque niveau, de A1 à C2")}
-   ${tile("go('dscgInfo')", "award", "Référentiel DSCG · UE6", "Format de l'épreuve, compétences et 7 thèmes")}`;
+   ${tile("go('dcgInfo')", "award", "Référentiel DCG · UE12", "Écrit de 3 heures : synthèse, commentaire, document professionnel")}
+   ${tile("go('dscgInfo')", "award", "Référentiel DSCG · UE6", "Format de l'épreuve, compétences et 7 thèmes")}
+   ${tile("go('reform')", "sparkle", "Réforme 2026 du DCG et du DSCG", "Calendrier et principaux changements")}`;
 };
 function refScreen(title, desc, items, render, train) {
   setNav("library");

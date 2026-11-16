@@ -57,11 +57,11 @@ function localCheck(text) {
   return out;
 }
 const LT_LABEL = { misspelling: "Orthographe", grammar: "Grammaire", typographical: "Typographie", style: "Style", duplication: "Répétition", whitespace: "Typographie", "locale-violation": "Variante", uncategorized: "Langue" };
-async function onlineCheck(text) {
+async function onlineCheck(text, lang = "en-GB") {
   if (!navigator.onLine || typeof fetch !== "function") return null;
   const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 9000);
   try {
-    const r = await fetch("https://api.languagetool.org/v2/check", { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ text, language: "en-GB", motherTongue: "fr" }) });
+    const r = await fetch("https://api.languagetool.org/v2/check", { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(lang === "fr" ? { text, language: "fr" } : { text, language: lang, motherTongue: "fr" }) });
     if (!r.ok) return null;
     const j = await r.json();
     return (j.matches || []).map(m => { const t = (m.rule && m.rule.issueType) || "uncategorized";
@@ -74,10 +74,11 @@ function mergeIssues(a, b) {
   return out.sort((x, y) => x.off - y.off);
 }
 const CONNECTORS = ["however", "moreover", "furthermore", "therefore", "although", "because", "but", "so", "then", "first", "firstly", "secondly", "finally", "in addition", "on the one hand", "on the other hand", "nevertheless", "whereas", "while", "as a result", "for example", "for instance", "in my opinion", "to conclude", "to sum up", "according to", "despite", "unless", "since", "thus", "indeed", "admittedly", "on balance", "in order to"];
+const CONNECTORS_FR = ["cependant", "toutefois", "en outre", "de plus", "ainsi", "donc", "enfin", "par ailleurs", "en effet", "tandis que", "alors que", "d abord", "ensuite", "en revanche", "par consequent", "selon", "car", "mais", "aussi", "egalement", "afin de", "puisque"];
 function gradeWriting(text, cfg, issues) {
   const words = text.trim() ? text.trim().split(/\s+/) : [], n = words.length, t = " " + norm(text) + " ";
   const sents = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.split(/\s+/).length >= 2);
-  const found = cfg.keys.filter(k => t.includes(norm(k))), conn = uniq(CONNECTORS.filter(c => t.includes(" " + c + " ")));
+  const found = cfg.keys.filter(k => t.includes(norm(k))), conn = uniq((cfg.lang === "fr" ? CONNECTORS_FR : CONNECTORS).filter(c => t.includes(" " + norm(c) + " ")));
   const uniqN = uniq(norm(text).split(" ").filter(Boolean)).length, guiraud = n ? uniqN / Math.sqrt(n) : 0;
   const errW = issues.reduce((s, x) => s + x.w, 0), rate = n ? errW / n * 100 : 0, avg = sents.length ? n / sents.length : 0;
   const C = [
@@ -91,7 +92,7 @@ function gradeWriting(text, cfg, issues) {
   const tips = [];
   if (n < cfg.min) tips.push(`Développe davantage : il manque ${cfg.min - n} mots.`);
   if (found.length < cfg.keys.length) tips.push(`Essaie d'intégrer : ${cfg.keys.filter(k => !found.includes(k)).join(", ")}.`);
-  if (conn.length < 3) tips.push("Ajoute des mots de liaison (however, moreover, therefore, for instance…) pour structurer ton texte.");
+  if (conn.length < 3) tips.push(cfg.lang === "fr" ? "Ajoute des mots de liaison (cependant, en outre, ainsi, par conséquent…) pour relier les idées des documents." : "Ajoute des mots de liaison (however, moreover, therefore, for instance…) pour structurer ton texte.");
   if (avg > 28) tips.push("Tes phrases sont très longues : coupe-les pour gagner en clarté.");
   if (avg && avg < 7) tips.push("Tes phrases sont très courtes : relie-les avec because, although, which…");
   if (guiraud < 5 && n >= 30) tips.push("Varie ton vocabulaire : évite de répéter les mêmes mots.");
@@ -117,7 +118,7 @@ function writeTask(cfg) {
   app.innerHTML = `<div class="topbar"><button class="iconbtn plain" id="wback">${icon("back")}</button><div style="flex:1"><div class="kicker" style="margin:0">${esc(cfg.kicker)}</div><h3>${esc(cfg.title)}</h3></div></div>
    <div class="card"><b>Sujet</b><p style="margin:6px 0 0">${esc(cfg.task)}</p><p class="muted small" style="margin-bottom:0">Objectif : au moins ${cfg.min} mots.${st.score != null ? ` Dernière note : ${String(st.score).replace(".", ",")} / 20.` : ""}</p></div>
    ${cfg.intro || ""}
-   <textarea class="txt area" id="tx" placeholder="Écris ton texte en anglais ici…" spellcheck="false">${esc(st.text)}</textarea>
+   <textarea class="txt area" id="tx" placeholder="${cfg.lang === "fr" ? "Écris ta synthèse en français ici…" : "Écris ton texte en anglais ici…"}" spellcheck="false">${esc(st.text)}</textarea>
    <div class="row between small muted" style="margin-top:8px"><span id="wc"></span><span>Expressions attendues</span></div><div class="keys" id="keys"></div>
    <button class="btn" id="ok">${icon("fix", 18)}Corriger mon texte</button>
    <label class="check"><input type="checkbox" id="lt" ${S.ltOn ? "checked" : ""}><span>Correction approfondie en ligne. Ton texte est alors envoyé au service LanguageTool.</span></label>
@@ -132,7 +133,7 @@ function writeTask(cfg) {
   $("#show").onclick = model;
   $("#ok").onclick = async () => {
     const text = st.text; $("#ok").disabled = true; $("#report").innerHTML = `<p class="muted center">Analyse en cours…</p>`;
-    const remote = S.ltOn ? await onlineCheck(text) : null, issues = mergeIssues(localCheck(text), remote), rep = reportHtml(text, cfg, issues, !!remote);
+    const remote = S.ltOn ? await onlineCheck(text, cfg.lang === "fr" ? "fr" : "en-GB") : null, issues = mergeIssues(cfg.lang === "fr" ? [] : localCheck(text), remote), rep = reportHtml(text, cfg, issues, !!remote);
     if (!$("#report")) return;
     const firstTime = !st.done; st.done = today(); st.score = Math.max(st.score || 0, rep.score); save(); if (firstTime) addXP(15);
     $("#report").innerHTML = rep.html; $("#ok").disabled = false; if (cfg.onDone) cfg.onDone(rep.score);

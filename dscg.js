@@ -13,7 +13,7 @@ function dscgHomeCard() {
   if (!S.dscg) return "";
   return `<div class="card row" style="cursor:pointer" onclick="go('dscg')"><div class="iconbtn" style="background:var(--gold);color:#fff">${icon("award")}</div><div style="flex:1"><b>Préparation DSCG · UE6</b><div class="muted small">${dscgReady()} % du programme travaillé${dscgDays() != null ? ` · J-${dscgDays()}` : ""}</div><div class="bar" style="height:6px;margin-top:6px"><i style="width:${dscgReady()}%;background:var(--gold)"></i></div></div>${icon("arrow", 20)}</div>`;
 }
-function dscgTile() { return (S.dscg ? `<div class="unit">Objectif DSCG</div>` : `<div class="unit">Examen professionnel</div>`) + tile("go('dscg')", "award", "Préparation DSCG · UE6", `Anglais des affaires : 7 thèmes, oraux blancs · ${dscgReady()} %`); }
+function dscgTile() { return `<div class="unit">Objectif DSCG</div>` + tile("go('dscg')", "award", "Préparation DSCG · UE6", `Anglais des affaires : 7 thèmes, oraux blancs · ${dscgReady()} %`); }
 function dscgDays() { if (!S.dscgDate) return null; const d = Math.ceil((new Date(S.dscgDate) - new Date(today())) / 864e5); return d >= 0 ? d : null; }
 
 SCREENS.dscg = function () {
@@ -28,15 +28,16 @@ SCREENS.dscg = function () {
    ${cur < target ? `<div class="card"><b>Tu pars de loin ? C'est prévu.</b><p class="muted small" style="margin-bottom:0">Avance d'abord dans le Parcours jusqu'au niveau B1, en faisant à chaque niveau l'unité d'anglais professionnel. Travaille en parallèle le vocabulaire des thèmes ci-dessous : il est accessible dès le niveau A2. Les synthèses et les oraux blancs deviennent utiles à partir de B1.</p></div>` : ""}
    <div class="unit">L'épreuve</div>
    ${tile("go('dscgInfo')", "doc", "Format et référentiel", "Déroulement, compétences évaluées, programme officiel")}
+   ${tile("go('reform')", "sparkle", "Réforme 2026", "Nouveau programme à partir de la session 2027")}
    ${tile("go('dscgMethod')", "target", "Méthode : réussir l'heure de préparation", "Plan minute par minute et structure de l'exposé")}
    ${tile("go('dscgPhrases')", "chat", "Phrases utiles pour l'oral", `${DSCG_PHRASES.reduce((n, g) => n + g.list.length, 0)} formules pour présenter, enchaîner, nuancer`)}
    <div class="unit">Les 7 thèmes du programme</div>
    ${DSCG_THEMES.map((t, i) => tile(`go('dscgTheme','${t.id}')`, "award", `${i + 1}. ${esc(t.fr)}`, esc(t.en), `<span class="tag ${dscgDone(t.id) === DSCG_STEPS.length ? "okk" : ""}">${dscgDone(t.id)} / ${DSCG_STEPS.length}</span>`)).join("")}
    <div class="card"><div class="row" style="color:var(--pri)">${icon("settings", 20)}<h3>Réglages DSCG</h3></div>
     <p class="muted small">Date de ton épreuve (facultatif)</p><input class="txt" type="date" id="dd" value="${S.dscgDate || ""}">
-    <button class="btn ${S.dscg ? "ghost" : "sec"}" id="dm">${S.dscg ? "Retirer le DSCG de mon accueil" : "Faire du DSCG mon objectif principal"}</button></div>`;
+    <button class="btn ${S.dscg ? "ghost" : "sec"}" id="dm" data-x="1">${S.dscg ? "Retirer le DSCG de mon accueil" : "Faire du DSCG mon objectif principal"}</button></div>`;
   $("#dd").onchange = () => { S.dscgDate = $("#dd").value || null; save(); go("dscg"); };
-  $("#dm").onclick = () => { toggleDscg(); go("dscg"); };
+  $("#dm").onclick = () => { setExam(S.dscg ? null : "dscg"); go("dscg"); };
 };
 
 SCREENS.dscgInfo = function () {
@@ -132,7 +133,7 @@ function dscgSynth(id) {
 }
 
 // ----- oral blanc -----
-function fmt(s) { return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; }
+function fmt(s) { const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = String(s % 60).padStart(2, "0"); return h ? `${h}:${String(m).padStart(2, "0")}:${x}` : `${String(m).padStart(2, "0")}:${x}`; }
 function startTimer(sec, el, onEnd) { clearInterval(window.__tm); let left = sec; const draw = () => { if (!document.body.contains(el)) return clearInterval(window.__tm); el.textContent = fmt(Math.max(0, left)); el.classList.toggle("late", left <= 60); };
   draw(); window.__tm = setInterval(() => { left--; draw(); if (left <= 0) { clearInterval(window.__tm); if (onEnd) onEnd(); } }, 1000); }
 function recorder(box) {
@@ -229,4 +230,3 @@ if (!S.mig3) {
 document.addEventListener("dblclick", e => e.preventDefault(), { passive: false });
 document.addEventListener("gesturestart", e => e.preventDefault());
 
-go(S.level ? "home" : "welcome");

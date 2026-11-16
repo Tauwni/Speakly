@@ -41,6 +41,8 @@ function mergeState(a, b) {
   const li = id => ORDER.indexOf(id);
   m.level = li(b.level) > li(a.level) ? b.level : a.level || b.level;
   m.name = a.name || b.name;
+  m.dcgP = byKey(a.dcgP, b.dcgP, (x, y) => ({ v: max(x.v, y.v) }));
+  if (a.routine || b.routine) { const ra = a.routine || {}, rb = b.routine || {}; m.routine = { on: ra.on || rb.on, log: byKey(ra.log, rb.log, (x, y) => [...new Set([...(x || []), ...(y || [])])]), words: [...(rb.words || []), ...(ra.words || []).filter(w => !(rb.words || []).some(z => z.en === w.en))] }; }
   return m;
 }
 const applyState = st => { S = Object.assign(S, st); try { localStorage.setItem("speakly2", JSON.stringify(S)); } catch (e) {} };
@@ -82,7 +84,8 @@ function syncBadge() { const b = document.querySelector(".chip.acc"); if (b) b.c
 const pinInput = (id, ph) => `<input class="txt pin" id="${id}" type="password" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" placeholder="${ph}">`;
 SCREENS.account = function (tab) {
   setNav(S.level ? "stats" : null);
-  const back = S.level ? backBtn("stats", "Progrès") : `<button class="backlink" onclick="go('welcome')">${icon("back", 17)}Accueil</button>`;
+  const gate = needGate();
+  const back = S.level ? backBtn("stats", "Progrès") : gate ? `<div class="gate-head">${logo(64)}<h1>Speakly</h1><p class="muted">De grand débutant à quasi bilingue.</p></div>` : `<button class="backlink" onclick="go('welcome')">${icon("back", 17)}Accueil</button>`;
   if (AUTH) {
     const last = AUTH.last ? new Date(AUTH.last).toLocaleString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "jamais";
     app.innerHTML = (S.level ? appbar() : "") + back + `<h2>Mon compte</h2>
@@ -114,14 +117,16 @@ SCREENS.account = function (tab) {
   }
   const mode = tab === "signup" ? "signup" : "login";
   app.innerHTML = (S.level ? appbar() : "") + back + `<h2>${mode === "signup" ? "Créer mon compte" : "Se connecter"}</h2>
-   <p class="muted" style="margin-top:6px">${mode === "signup" ? "Un compte sauvegarde ta progression en ligne pour la retrouver sur tous tes appareils. Ta progression actuelle est conservée." : "Retrouve ta progression sur cet appareil avec ton pseudo et ton code secret."}</p>
+   <p class="muted" style="margin-top:6px">${mode === "signup" ? (gate ? "Ton compte sauvegarde ta progression en ligne : tu la retrouves sur ton téléphone comme sur ton ordinateur." : "Un compte sauvegarde ta progression en ligne pour la retrouver sur tous tes appareils. Ta progression actuelle est conservée.") : "Retrouve ta progression sur cet appareil avec ton pseudo et ton code secret."}</p>
    <div class="toggle" id="mt"><button data-m="login" class="${mode === "login" ? "on" : ""}">Se connecter</button><button data-m="signup" class="${mode === "signup" ? "on" : ""}">Créer un compte</button></div>
    <div class="card">
     <p class="small muted" style="margin:0 0 6px">Pseudo</p><input class="txt" id="nm" autocomplete="username" autocapitalize="off" maxlength="24" placeholder="ex. lea.martin" value="${esc(mode === "signup" && S.name && S.name !== "toi" ? S.name : "")}">
     <p class="small muted" style="margin:14px 0 6px">Code secret (6 chiffres)</p>${pinInput("pn", "••••••")}
     ${mode === "signup" ? `<div style="height:10px"></div>${pinInput("pn2", "Confirme ton code")}<p class="muted small" style="margin-bottom:0">Choisis un code que tu retiendras : il te sera demandé à chaque connexion. Il n'est pas récupérable.</p>` : ""}
     <p class="msg" id="msg"></p>
-    <button class="btn" id="go">${mode === "signup" ? "Créer mon compte" : "Se connecter"}</button></div>`;
+    <button class="btn" id="go">${mode === "signup" ? "Créer mon compte" : "Se connecter"}</button></div>
+   ${gate ? `<button class="btn ghost" id="skip">Continuer sans compte</button><p class="muted small center">Sans compte, ta progression reste uniquement sur cet appareil. Tu pourras créer un compte plus tard depuis l'onglet Progrès.</p>` : ""}`;
+  if ($("#skip")) $("#skip").onclick = () => { S.skipAuth = true; save(); go("welcome"); };
   $$("#mt button").forEach(b => b.onclick = () => go("account", b.dataset.m));
   const msg = t => { $("#msg").textContent = t; };
   $("#go").onclick = async () => {
@@ -134,6 +139,7 @@ SCREENS.account = function (tab) {
       if (mode === "signup") {
         const r = await api("/signup", "POST", { name, pin, data: S.level ? JSON.stringify(S) : undefined });
         AUTH = { token: r.token, name: r.name, version: r.version, last: Date.now() }; authSave();
+        if (!S.name) { S.name = r.name; save(); }
         if (!S.level) { go("welcome"); return toast(`Compte créé. Bienvenue ${r.name} !`); }
         go("home"); toast("Compte créé : ta progression est sauvegardée en ligne.");
       } else {
@@ -149,4 +155,8 @@ SCREENS.account = function (tab) {
 };
 
 // ----- points d'entrée dans l'interface -----
+function needGate() { return !S.level && !AUTH && !S.skipAuth; }
+const _welcome = SCREENS.welcome;
+SCREENS.welcome = function () { if (needGate()) return SCREENS.account("signup"); return _welcome(); };
+go(S.level ? "home" : "welcome");
 if (AUTH) { pullNow(true); addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pullNow(true); else if (SYNC.timer) { clearTimeout(SYNC.timer); pushNow(); } }); addEventListener("online", () => queueSync(300)); }

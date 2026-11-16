@@ -110,12 +110,12 @@ SCREENS.welcome = function () {
     <h3 style="margin-top:18px">Ton objectif quotidien</h3>
     <div class="seg" id="goal">${[[10, "Tranquille"], [30, "Régulier"], [50, "Sérieux"], [100, "Intensif"]].map(([g, t]) => `<button data-g="${g}" class="${g === S.goal ? "on" : ""}">${g} XP<small>${t}</small></button>`).join("")}</div>
     <h3 style="margin-top:18px">Ton objectif</h3>
-    <div class="seg seg2" id="obj"><button data-o="0" class="${S.dscg ? "" : "on"}">Anglais général<small>Parcours complet</small></button><button data-o="1" class="${S.dscg ? "on" : ""}">Préparer le DSCG<small>UE6 Anglais des affaires</small></button></div>
+    <div class="seg seg3" id="obj">${[["gen", "Anglais", "Parcours complet"], ["dcg", "DCG", "UE12 · écrit"], ["dscg", "DSCG", "UE6 · oral"]].map(([k, t, d]) => `<button data-o="${k}" class="${(S.dcg ? "dcg" : S.dscg ? "dscg" : "gen") === k ? "on" : ""}">${t}<small>${d}</small></button>`).join("")}</div>
     <button class="btn" id="test">${icon("target", 20)}Passer le test de niveau</button>
     <button class="btn ghost" id="zero">Je pars de zéro</button></div>
    <div class="card row" style="cursor:pointer" onclick="go('account','login')"><div class="iconbtn">${icon("user")}</div><div style="flex:1"><b>${typeof AUTH !== "undefined" && AUTH ? `Connecté : ${esc(AUTH.name)}` : "J'ai déjà un compte"}</b><div class="muted small">${typeof AUTH !== "undefined" && AUTH ? "Ta progression sera sauvegardée en ligne" : "Retrouve ta progression avec ton pseudo et ton code secret"}</div></div>${icon("arrow", 20)}</div>`;
   $$("#goal button").forEach(b => b.onclick = () => { S.goal = +b.dataset.g; $$("#goal button").forEach(x => x.classList.toggle("on", x === b)); });
-  $$("#obj button").forEach(b => b.onclick = () => { S.dscg = b.dataset.o === "1"; $$("#obj button").forEach(x => x.classList.toggle("on", x === b)); });
+  $$("#obj button").forEach(b => b.onclick = () => { S.dcg = b.dataset.o === "dcg"; S.dscg = b.dataset.o === "dscg"; $$("#obj button").forEach(x => x.classList.toggle("on", x === b)); });
   const name = () => { S.name = $("#nm").value.trim() || "toi"; save(); };
   $("#test").onclick = () => { name(); go("placement"); };
   $("#zero").onclick = () => { name(); S.level = "A0"; save(); go("home"); };
@@ -164,6 +164,8 @@ SCREENS.home = function () {
      <button class="btn light" onclick="go('lesson','${nx.id}')">${icon("play", 18)}${RES()["les:" + nx.id] ? `Reprendre la leçon (${RES()["les:" + nx.id].solved}/${RES()["les:" + nx.id].total})` : S.done[ALL[0].id] || total ? "Continuer" : "Commencer"}</button></div>`
      : `<div class="hero"><div class="eyebrow">Parcours terminé</div><h2>Bravo ${esc(S.name)} !</h2><div class="meta">Tu as terminé les ${ALL.length} leçons. Continue les révisions pour garder ton niveau.</div></div>`}
    ${resumeCards()}
+   ${routineCard()}
+   ${dcgHomeCard()}
    ${dscgHomeCard()}
    ${due ? `<div class="card row" style="cursor:pointer" onclick="go('review')"><div class="iconbtn">${icon("brain")}</div><div style="flex:1"><b>${due} mot${due > 1 ? "s" : ""} à réviser</b><div class="muted small">Révise maintenant pour les fixer dans ta mémoire</div></div>${icon("arrow", 20)}</div>` : ""}
    ${errTodo().length ? `<div class="card row" style="cursor:pointer" onclick="go('errors')"><div class="iconbtn" style="background:var(--ko-soft);color:var(--ko)">${icon("fix")}</div><div style="flex:1"><b>${errTodo().length} erreur${errTodo().length > 1 ? "s" : ""} à retravailler</b><div class="muted small">Corrige tes points faibles en quelques minutes</div></div>${icon("arrow", 20)}</div>` : ""}
@@ -181,7 +183,7 @@ SCREENS.home = function () {
    }).join("")}`;
   $$(".level-head").forEach(h => h.onclick = () => { S.openLv = S.openLv === h.dataset.lv ? "-" : h.dataset.lv; save(); go("home"); });
   $$("[data-les]").forEach(e => e.onclick = () => go("lesson", e.dataset.les));
-  bindResumeCards();
+  bindResumeCards(); bindRoutine();
 };
 
 // ----- test de passage -----
@@ -622,11 +624,11 @@ SCREENS.stats = function () {
    <div class="card row" style="cursor:pointer" onclick="go('account')"><div class="iconbtn">${icon("user")}</div><div style="flex:1"><b>${typeof AUTH !== "undefined" && AUTH ? `Mon compte : ${esc(AUTH.name)}` : "Créer un compte"}</b><div class="muted small">${typeof AUTH !== "undefined" && AUTH ? "Progression sauvegardée en ligne et synchronisée" : "Sauvegarde ta progression en ligne et retrouve-la sur tous tes appareils"}</div></div>${icon("arrow", 20)}</div>
    <div class="card"><div class="row">${icon("settings", 20)}<h3>Réglages</h3></div>
     <p class="muted small">Objectif quotidien</p><div class="seg" id="goal">${[10, 30, 50, 100].map(g => `<button data-g="${g}" class="${g === S.goal ? "on" : ""}">${g}<small>XP</small></button>`).join("")}</div>
-    <p class="muted small">Objectif</p><div class="seg seg2" id="obj"><button data-o="0" class="${S.dscg ? "" : "on"}">Anglais général</button><button data-o="1" class="${S.dscg ? "on" : ""}">Préparer le DSCG</button></div>
+    <p class="muted small">Objectif</p><div class="seg seg3" id="obj">${[["gen", "Anglais", "Parcours complet"], ["dcg", "DCG", "UE12 · écrit"], ["dscg", "DSCG", "UE6 · oral"]].map(([k, t, d]) => `<button data-o="${k}" class="${(S.dcg ? "dcg" : S.dscg ? "dscg" : "gen") === k ? "on" : ""}">${t}<small>${d}</small></button>`).join("")}</div>
     <button class="btn sec" onclick="go('placement')">${icon("target", 18)}Repasser le test de niveau</button>
     <button class="btn ghost" id="reset" style="color:var(--ko)">${icon("reset", 18)}Réinitialiser ma progression</button></div>`;
   $$("#goal button").forEach(b => b.onclick = () => { S.goal = +b.dataset.g; save(); go("stats"); });
-  $$("#obj button").forEach(b => b.onclick = () => { toggleDscg(b.dataset.o === "1"); go("stats"); window.scrollTo(0, document.body.scrollHeight); });
+  $$("#obj button").forEach(b => b.onclick = () => { setExam(b.dataset.o); go("stats"); window.scrollTo(0, document.body.scrollHeight); });
   $("#reset").onclick = () => { if (confirm("Effacer toute ta progression ? Cette action est définitive.")) { localStorage.removeItem("speakly2"); location.reload(); } };
 };
 

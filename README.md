@@ -28,6 +28,7 @@
 - [Aperçu](#aperçu)
 - [Fonctionnalités](#fonctionnalités)
 - [Le parcours](#le-parcours)
+- [Préparation DCG (UE12)](#préparation-dcg-ue12)
 - [Préparation DSCG](#préparation-dscg)
 - [Installer l'application](#installer-lapplication)
 - [Lancer le projet en local](#lancer-le-projet-en-local)
@@ -52,6 +53,7 @@
 | **Révisions espacées** | Chaque mot revient au bon moment (1, 3, 7, 16, 35 jours…) pour être retenu sur le long terme. |
 | **Onglet Erreurs** | Chaque faute est gardée avec ta réponse et la bonne réponse, classée par thème ou par leçon. Elle est corrigée quand tu la réussis deux fois de suite. |
 | **Compte et synchronisation** | Facultatif : un pseudo et un code secret à 6 chiffres suffisent. La progression est sauvegardée en ligne et retrouvée sur tous tes appareils. |
+| **Routine quotidienne** | Check-list du jour : série en VO, oral à voix haute, podcast, lecture, séance du jour, révisions. Séries et podcasts conseillés par niveau, carnet de mots ajoutés aux révisions. |
 | **Reprise des sessions** | Tu quittes une leçon, un examen ou un entraînement : tu reprends plus tard exactement à la même question. |
 | **Pratique** | Séance du jour, 110 verbes irréguliers, conjugaison sur 11 temps, histoires à écouter, dialogues de situation, paires de sons, nombres et heures, « corrige l'erreur », phrasal verbs, expressions idiomatiques, faux amis. |
 | **Correction de l'écrit** | 14 sujets de rédaction notés sur 20 : fautes soulignées et expliquées en français, conseils et corrigé modèle. Fonctionne hors ligne, avec une analyse complémentaire en ligne facultative. |
@@ -71,6 +73,10 @@
 | **B2** | Intermédiaire avancé | Argumenter, rapporter des propos, maîtriser le vocabulaire de l'audit, de la gouvernance, de la stratégie et des RH. |
 | **C1** | Avancé | Nuancer finement, parler de marchés financiers, de normes comptables et de systèmes d'information. |
 | **C2** | Maîtrise | Comprendre la presse économique, synthétiser un document et répondre à un jury avec aisance. |
+
+## Préparation DCG (UE12)
+
+L'épreuve écrite de 3 heures du DCG : six thèmes de vocabulaire (l'entreprise, financement et RSE, travail et RH, innovation, numérique, économie et société), synthèses de documents en français, commentaires et documents professionnels en anglais corrigés automatiquement, et une épreuve blanche chronométrée. Un écran résume la **réforme 2026** du DCG et du DSCG (premières épreuves réformées en 2027).
 
 ## Préparation DSCG
 
@@ -118,6 +124,8 @@ Speakly/
 ├── practice.js         Onglets Pratique et Ressources, examens, badges
 ├── check.js            Correction automatique de l'expression écrite
 ├── dscg.js             Mode Préparation DSCG et référentiel CECRL
+├── routine.js          Routine quotidienne (séries, oral, écoute, carnet de mots)
+├── dcgmode.js          Mode Préparation DCG et écran Réforme 2026
 ├── sync.js             Compte et synchronisation de la progression
 ├── server/             Serveur de comptes (Cloudflare Worker + base D1)
 ├── data/
