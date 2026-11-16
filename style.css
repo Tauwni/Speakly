@@ -214,3 +214,8 @@ details.qa{border-bottom:1px solid var(--line)}details.qa:last-child{border:0}
 details.qa summary{display:flex;align-items:center;gap:6px;padding:10px 0;font-weight:600;cursor:pointer;list-style:none}
 details.qa summary::-webkit-details-marker{display:none}
 input[type=date].txt{font-size:16px;padding:12px 14px}
+
+/* reprise des sessions */
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;font-size:14px;font-weight:600;box-shadow:var(--shadow);transition:opacity .4s}
+.toast.out{opacity:0}
+.resume .bar i{background:var(--pri)}

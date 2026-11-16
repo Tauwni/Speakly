@@ -12,24 +12,31 @@ const pracInfo = mod => { const p = S.prac[mod]; return p ? `${p.n} séance${p.n
 const tile = (go1, ic, title, desc, right = "") => `<button class="tile" onclick="${go1}"><span class="ib">${icon(ic, 22)}</span><span class="tx"><b>${title}</b><small>${desc}</small></span>${right ? `<span class="rt">${right}</span>` : `<span class="muted">${icon("arrow", 18)}</span>`}</button>`;
 
 // ----- moteur de séance -----
-function runSet(o) {
+function runSet(o, mode) {
   setNav(null);
-  const queue = o.list.filter(Boolean), total = queue.length, missed = new Set(); let first = 0, solved = 0;
-  const back = () => go(...(o.back || ["practice"]));
+  const rk = "set:" + (o.key || o.mod), saved = RES()[rk], back = () => go(...(o.back || ["practice"]));
+  if (saved && !mode) return resumeAsk(saved, () => runSet(o, "resume"), () => runSet(o, "restart"), back);
+  if (mode === "restart") resDrop(rk);
+  const R = mode === "resume" && saved;
+  let queue, total, first = 0, solved = 0, missed = new Set();
+  if (R) { queue = R.q; total = R.total; first = R.first; solved = R.solved; missed = new Set(R.missed); }
+  else { queue = o.list.filter(Boolean); queue.forEach((e, i) => e._k = i); total = queue.length; }
   if (!total) return back();
+  const keep = cur => resSave(rk, { title: o.title, re: o.re || null, q: [cur, ...queue], total, first, solved, missed: [...missed] });
   const next = () => {
-    if (!queue.length) return finish();
+    if (!queue.length) { resDrop(rk); return finish(); }
     const e = queue.shift();
     if (e.track === undefined) e.track = !["match", "speak"].includes(e.type);
     if (!e.les && !e.src) e.src = o.src || o.title;
+    keep(e);
     play(e, (good, given) => {
-      const firstTime = !missed.has(e);
+      const firstTime = !missed.has(e._k);
       if ((e.track || e.errId) && (!good || firstTime)) errSeen(e, good, given);
-      if (e.onAnswer && firstTime) e.onAnswer(good);
+      if (firstTime) { if (e.srsK && S.srs[e.srsK]) srsGrade(e.srsK, good); if (e.srsNew && e.word) srsAdd(e.word, good); }
       if (good) { solved++; if (firstTime) first++; S.answers.ok++; }
-      else { S.answers.ko++; missed.add(e); if (o.exam) solved++; else queue.splice(Math.min(queue.length, 3), 0, e); }
+      else { S.answers.ko++; missed.add(e._k); if (o.exam) solved++; else queue.splice(Math.min(queue.length, 3), 0, e); }
       save(); next();
-    }, solved / total, back);
+    }, solved / total, () => { toast(`Progression sauvegardée : ${o.exam ? "l'examen" : "la série"} reprendra là où tu t'es arrêté.`); back(); });
   };
   const finish = () => {
     const pct = Math.round(first / total * 100), gain = Math.max(2, Math.round(first * (o.xp || 1.5)));
@@ -88,7 +95,7 @@ function irrEx(v, t) {
   return { type: "type", kicker: "Verbes irréguliers", q: `Comment dit-on « ${v.fr} » au prétérit ?`, a: alts(v.past), exact: true, ph: "Prétérit", cat: "conj", note };
 }
 const irrPool = () => myLv() <= 2 ? IRR.filter(v => v.core) : IRR;
-function startIrr() { runSet({ title: "Verbes irréguliers", mod: "irr", icon: "review", list: pick(irrPool(), 12).map((v, i) => irrEx(v, i % 4)), again: startIrr }); }
+function startIrr() { runSet({ re: "startIrr()", title: "Verbes irréguliers", mod: "irr", icon: "review", list: pick(irrPool(), 12).map((v, i) => irrEx(v, i % 4)), again: startIrr }); }
 
 // ----- conjugaison -----
 const STATIVE = ["be", "know", "like", "want", "need", "understand", "mean", "cost", "hear", "see", "forget", "forgive", "have", "enjoy"];
@@ -124,11 +131,11 @@ function conjEx() {
   const F = { aff: "affirmative", neg: "négative", q: "interrogative" }[f];
   return { type: "type", kicker: "Conjugaison", q: `Conjugue « to ${v.b} » avec « ${s} » : ${T.fr}, forme ${F}`, sub: `${v.fr} · ${T.en}`, a: conjugate(v, s, T.id, f), exact: true, ph: f === "q" ? "Auxiliaire + sujet + verbe" : "Sujet + verbe", cat: "conj", note: T.hint };
 }
-function startConj() { runSet({ title: "Conjugaison", mod: "conj", icon: "memo", list: [...Array(10)].map(conjEx), again: startConj }); }
+function startConj() { runSet({ re: "startConj()", title: "Conjugaison", mod: "conj", icon: "memo", list: [...Array(10)].map(conjEx), again: startConj }); }
 
 // ----- prononciation : paires minimales -----
 function pronEx(p) { const w = p[Math.random() < .5 ? 0 : 1]; return { type: "listen", kicker: "Prononciation", q: "Quel mot entends-tu ?", say: w, a: w, opts: shuffle([p[0], p[1]]), cat: "listen", note: `${p[0]} ≠ ${p[1]}` }; }
-function startPron() { runSet({ title: "Prononciation", mod: "pron", icon: "mic", list: pick(MIN_PAIRS, 12).map(pronEx), again: startPron }); }
+function startPron() { runSet({ re: "startPron()", title: "Prononciation", mod: "pron", icon: "mic", list: pick(MIN_PAIRS, 12).map(pronEx), again: startPron }); }
 
 // ----- nombres, heures, prix -----
 const ONES = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split(" ");
@@ -161,14 +168,14 @@ function numEx(kind) {
   const p = rnd(1, 99), c = rnd(1, 19) * 5, cc = String(c).padStart(2, "0");
   return { type: "dictation", kicker: "Les prix · écoute", q: "Écris le prix que tu entends (format 4.50)", say: `${numWords(p)} pounds ${numWords(c)}`, a: `${p}.${cc}`, exact: true, ph: "ex. 4.50", cat: "listen", note: `£${p}.${cc} = ${numWords(p)} pounds ${numWords(c)}` };
 }
-function startNum() { runSet({ title: "Nombres, heures et prix", mod: "num", icon: "hash", list: shuffle([0, 0, 1, 1, 2, 2, 3, 3, 4, 5, 5, 0]).map(numEx), again: startNum }); }
+function startNum() { runSet({ re: "startNum()", title: "Nombres, heures et prix", mod: "num", icon: "hash", list: shuffle([0, 0, 1, 1, 2, 2, 3, 3, 4, 5, 5, 0]).map(numEx), again: startNum }); }
 
 // ----- corrige l'erreur -----
 function fixEx(f, i) {
   return i % 2 ? { type: "type", kicker: "Corrige l'erreur", q: `Corrige cette phrase : « ${f.bad} »`, a: f.good, exact: true, ph: "La phrase correcte", cat: "gram", note: f.note, lv: f.lv }
     : { type: "mcq", kicker: "Corrige l'erreur", q: "Quelle phrase est correcte ?", a: f.good, opts: shuffle([f.good, f.bad]), cat: "gram", note: f.note, lv: f.lv };
 }
-function startFix() { runSet({ title: "Corrige l'erreur", mod: "fix", icon: "fix", list: pick(atLv(FIXES), 10).map(fixEx), again: startFix }); }
+function startFix() { runSet({ re: "startFix()", title: "Corrige l'erreur", mod: "fix", icon: "fix", list: pick(atLv(FIXES), 10).map(fixEx), again: startFix }); }
 
 // ----- verbes à particule, expressions, faux amis -----
 function deckList(kind) {
@@ -184,7 +191,7 @@ function deckList(kind) {
     return i % 2 ? { type: "mcq", kicker: "Faux amis", q: `Comment dit-on « ${p.faux} » en anglais ?`, a: p.fauxEn, opts: optsOf(p.fauxEn, [p.en, ...others.map(x => x.fauxEn)]), cat: "expr", note }
       : { type: "mcq", kicker: "Faux amis", q: `« ${p.en} » signifie :`, say: p.en, a: p.fr, opts: optsOf(p.fr, [p.faux, ...others.map(x => x.fr)]), cat: "expr", note }; });
 }
-function startDeck(kind) { runSet({ title: { phr: "Verbes à particule", idi: "Expressions idiomatiques", ff: "Faux amis" }[kind], mod: kind, icon: "sparkle", list: deckList(kind), again: () => startDeck(kind) }); }
+function startDeck(kind) { runSet({ re: `startDeck('${kind}')`, title: { phr: "Verbes à particule", idi: "Expressions idiomatiques", ff: "Faux amis" }[kind], mod: kind, icon: "sparkle", list: deckList(kind), again: () => startDeck(kind) }); }
 
 // ----- dialogues -----
 SCREENS.dialogues = function () {
@@ -210,7 +217,7 @@ SCREENS.dialogue = function (i) {
         .concat(ls.slice(0, 2).map(l => ({ type: "order", kicker: "Dialogue · réplique", q: `Remets la réplique dans l'ordre : « ${l.fr} »`, a: l.en, say: l.en, cat: "sent", lv: d.lv })),
           ls.slice(2, 4).map(l => ({ type: "dictation", kicker: "Dialogue · dictée", q: "Écris la réplique que tu entends", say: l.en, a: l.en, cat: "listen", lv: d.lv })),
           ls.slice(4, 6).map(l => { const c = clozeEx(l); if (c) { c.kicker = "Dialogue · phrase à trous"; c.lv = d.lv; } return c; }));
-      runSet({ title: d.title, mod: "dlg" + i, icon: "chat", list, back: ["dialogues"] });
+      runSet({ re: `go('dialogue',${i})`, title: d.title, mod: "dlg" + i, icon: "chat", list, back: ["dialogues"] });
     };
   };
   draw();
@@ -229,7 +236,7 @@ SCREENS.story = function (i) {
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn ghost" id="slow" style="width:auto;margin:0;padding:8px 14px">Plus lentement</button><button class="btn ghost" id="stop" style="width:auto;margin:0;padding:8px 14px">Arrêter</button></div></div>
    <button class="btn" id="ex">Répondre aux questions ${icon("arrow", 20)}</button>`;
   $("#sp").onclick = () => speak(d.t, .9); $("#slow").onclick = () => speak(d.t, .65); $("#stop").onclick = () => { try { speechSynthesis.cancel(); } catch (e) {} };
-  $("#ex").onclick = () => runSet({ title: d.title, mod: "sto" + i, icon: "headphones", back: ["stories"], xp: 3,
+  $("#ex").onclick = () => runSet({ re: `go('story',${i})`, title: d.title, mod: "sto" + i, icon: "headphones", back: ["stories"], xp: 3,
     list: d.q.map(q => ({ type: "mcq", kicker: "Compréhension orale", q: q[0], a: q[1], opts: shuffle(q.slice(1)), say: d.t, quiet: true, cat: "listen", lv: d.lv })),
     after: `<div class="card"><div class="row between"><h3>Le texte</h3><button class="iconbtn plain sm" data-say="${esc(d.t)}">${icon("speaker", 18)}</button></div><p style="margin-bottom:0">${esc(d.t)}</p></div>` });
 };
@@ -277,7 +284,7 @@ function startExam(id) {
   const cl = pick(sents, 3).map(clozeEx).filter(Boolean).map(c => (c.kicker = `Examen ${id} · phrase à trous`, c));
   const list = shuffle(pick(quiz, 20 - voc.length - cl.length).concat(voc, cl));
   list.forEach(e => { e.lv = id; });
-  runSet({ title: `Examen ${id}`, mod: "exam" + id, icon: "award", exam: true, list, back: ["exams"], xp: 2,
+  runSet({ re: `startExam('${id}')`, title: `Examen ${id}`, mod: "exam" + id, icon: "award", exam: true, list, back: ["exams"], xp: 2,
     done: pct => { const ok = pct >= EXAM_PASS; if (ok && (!S.certs[id] || S.certs[id].pct < pct)) { S.certs[id] = { date: today(), pct }; save(); }
       return `<div class="card center cert ${ok ? "got" : ""}">${ok ? `<span style="color:var(--gold)">${icon("award", 44)}</span><h3 style="margin-top:8px">Certificat ${id} obtenu</h3><p class="muted" style="margin-bottom:0">${esc(S.name)} a validé le niveau ${LV(id).name} avec ${pct} %.</p>` : `<h3>${pct} % : pas encore</h3><p class="muted" style="margin-bottom:0">Il faut ${EXAM_PASS} %. Revois les leçons du niveau et tes erreurs, puis retente.</p>`}</div>`; } });
 }
@@ -287,7 +294,7 @@ function startDaily() {
   const list = [];
   shuffle(dueCards()).slice(0, 4).forEach(k => { const [en, fr] = k.split("|"), l = WORD_LES[k], others = shuffle(l ? lessonsOf(l.level).flatMap(x => x.words) : []);
     const e = S.srs[k].box >= 2 ? { type: "type", kicker: "Séance du jour · révision", q: `Écris en anglais : « ${fr} »`, a: en } : { type: "mcq", kicker: "Séance du jour · révision", q: `Que signifie « ${en} » ?`, say: en, a: fr, opts: optsOf(fr, others.map(x => x.fr)) };
-    e.word = { en, fr }; if (l) { e.les = l.id; e.lv = l.level; } e.onAnswer = good => srsGrade(k, good); list.push(e); });
+    e.word = { en, fr }; if (l) { e.les = l.id; e.lv = l.level; } e.srsK = k; list.push(e); });
   errPick(errTodo()).slice(0, 3).forEach(id => list.push(errExercise(S.errors[id])));
   const doneLs = ALL.filter(l => S.done[l.id] && l.quiz.length), src = doneLs.length ? doneLs : lessonsOf(currentLevel()).slice(0, 3);
   pick(src.flatMap(l => l.quiz.map(q => [q, l])), 3).forEach(([q, l]) => list.push({ type: "mcq", kicker: "Séance du jour · grammaire", q: q[0], a: q[1], opts: shuffle(q.slice(1)), les: l.id, lv: l.level, cat: "gram" }));
@@ -295,7 +302,7 @@ function startDaily() {
   list.push(conjEx(), irrEx(pick(irrPool(), 1)[0], 0), numEx(pick([0, 2, 3], 1)[0]), fixEx(pick(atLv(FIXES, 0), 1)[0], 0));
   if (S.dscg) list.push(...dscgDailyEx());
   while (list.filter(Boolean).length < 12) list.push(conjEx());
-  runSet({ title: "Séance du jour", mod: "daily", icon: "bolt", list: list.filter(Boolean), again: startDaily,
+  runSet({ re: "startDaily()", key: "daily" + today(), title: "Séance du jour", mod: "daily", icon: "bolt", list: list.filter(Boolean), again: startDaily,
     done: () => { if (S.dailyDone === today()) return ""; S.dailyDone = today(); S.xp += 15; S.days[today()] = (S.days[today()] || 0) + 15; save(); return `<div class="card row"><div class="iconbtn">${icon("bolt")}</div><div><b>Bonus quotidien : +15 XP</b><div class="muted small">Reviens demain pour une nouvelle séance.</div></div></div>`; } });
 }
 

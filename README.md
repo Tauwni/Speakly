@@ -8,6 +8,7 @@ Elle fonctionne dans le navigateur, sur ordinateur comme sur téléphone, et s'i
 
 - **Test de niveau adaptatif** au démarrage pour commencer au bon endroit.
 - **Parcours de 140 leçons** de A0 à C2 : règle de grammaire, cartes mémoire, vocabulaire avec audio, puis exercices (QCM, écoute, dictée, traduction, phrases à remettre dans l'ordre, phrases à trous, association de paires, lecture, prononciation). Chaque niveau comprend une unité d'anglais professionnel.
+- **Reprise des sessions** : une leçon, un examen ou un entraînement interrompu est sauvegardé ; tu reprends plus tard exactement à la même question, depuis l'accueil ou en relançant l'activité.
 - **Révisions espacées** : chaque mot revient au bon moment (1, 3, 7, 16 jours…).
 - **Onglet Erreurs** : chaque faute est enregistrée avec ta réponse et la bonne réponse, classée par thème ou par leçon, et à retravailler jusqu'à deux réussites d'affilée.
 - **Onglet Pratique** : séance du jour, verbes irréguliers, conjugaison, histoires à écouter, dialogues de situation, prononciation, nombres et heures, corrige l'erreur, expression écrite, verbes à particule, expressions idiomatiques, faux amis, examens de fin de niveau avec certificats.

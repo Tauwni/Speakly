@@ -90,7 +90,7 @@ function dscgVocabSet(t, n = 10) {
       : k === 1 ? { type: "mcq", q: `Comment dit-on « ${w.fr} » ?`, a: w.en, opts: optsOf(w.en, others.map(x => x.en)) }
       : k === 2 ? { type: "type", q: `Écris en anglais : « ${w.fr} »`, a: w.en }
       : { type: "listen", q: "Écoute et choisis la traduction", say: w.en, a: w.fr, opts: optsOf(w.fr, others.map(x => x.fr)) };
-    return Object.assign(e, { kicker: `DSCG · ${t.fr}`, word: w, cat: "dscg", onAnswer: good => srsAdd(w, good) }); });
+    return Object.assign(e, { kicker: `DSCG · ${t.fr}`, word: w, cat: "dscg", srsNew: true }); });
   if (ws.length >= 5) list.splice(4, 0, matchEx(ws.slice(0, 5)));
   return list;
 }
@@ -100,14 +100,14 @@ SCREENS.dscgVocab = function (id) {
    <button class="btn" id="tr">${icon("play", 18)}S'entraîner</button>
    <div class="card" style="padding:4px 16px">${t.vocab.map(w => { const c = S.srs[key(w)]; return `<div class="vocab">${sayBtn(w.en)}<div style="flex:1"><div class="en">${esc(w.en)}</div><div class="fr">${esc(w.fr)}</div></div>${c ? `<span class="tag" style="${c.box >= 3 ? "background:var(--ok-soft);color:var(--ok)" : ""}">${c.box >= 3 ? "maîtrisé" : "en cours"}</span>` : ""}</div>`; }).join("")}</div>`;
   $$("[data-say]").forEach(b => b.onclick = () => speak(b.dataset.say));
-  $("#tr").onclick = () => runSet({ title: `Vocabulaire · ${t.fr}`, src: `DSCG · ${t.fr}`, mod: "dscgV" + id, icon: "book", list: dscgVocabSet(t), back: ["dscgVocab", id],
+  $("#tr").onclick = () => runSet({ re: `go('dscgVocab','${id}')`, title: `Vocabulaire · ${t.fr}`, src: `DSCG · ${t.fr}`, mod: "dscgV" + id, icon: "book", list: dscgVocabSet(t), back: ["dscgVocab", id],
     done: pct => { dP(id).v = Math.max(dP(id).v || 0, pct) || 1; save(); return ""; } });
 };
 function dscgNotions(id) {
   const t = DT(id), list = shuffle(t.notions).map((n, i) => i % 2
     ? { type: "mcq", kicker: "DSCG · notions", q: `What is « ${n[0]} »?`, say: n[0], a: n[1], opts: optsOf(n[1], shuffle(t.notions).map(x => x[1])), cat: "dscg", quiet: true }
     : { type: "mcq", kicker: "DSCG · notions", q: `Which term matches this definition? « ${n[1]} »`, a: n[0], opts: optsOf(n[0], shuffle(t.notions).map(x => x[0])), cat: "dscg" });
-  runSet({ title: `Notions · ${t.fr}`, src: `DSCG · ${t.fr}`, mod: "dscgN" + id, icon: "brain", list, back: ["dscgTheme", id],
+  runSet({ re: `dscgNotions('${id}')`, title: `Notions · ${t.fr}`, src: `DSCG · ${t.fr}`, mod: "dscgN" + id, icon: "brain", list, back: ["dscgTheme", id],
     done: pct => { dP(id).n = Math.max(dP(id).n || 0, pct) || 1; save(); return ""; },
     after: `<div class="card"><h3>À retenir</h3>${t.notions.map(n => `<div class="vocab"><div><div class="en">${esc(n[0])}</div><div class="fr">${esc(n[1])}</div></div></div>`).join("")}</div>` });
 }
@@ -119,7 +119,7 @@ SCREENS.dscgArticle = function (id) {
    <div class="card"><b>Question d'oral</b><p style="margin:6px 0 0">${esc(a.question)}</p></div>
    <button class="btn" id="ex">Questions de compréhension ${icon("arrow", 20)}</button>`;
   $("#say").onclick = () => speak(a.t, .9);
-  $("#ex").onclick = () => runSet({ title: a.title, src: `DSCG · ${t.fr}`, mod: "dscgA" + id, icon: "doc", back: ["dscgTheme", id], xp: 3,
+  $("#ex").onclick = () => runSet({ re: `go('dscgArticle','${id}')`, title: a.title, src: `DSCG · ${t.fr}`, mod: "dscgA" + id, icon: "doc", back: ["dscgTheme", id], xp: 3,
     list: a.q.map(q => ({ type: "read", kicker: "DSCG · compréhension", text: a.t, q: q[0], a: q[1], opts: shuffle(q.slice(1)), cat: "dscg" })),
     done: () => { dP(id).a = true; save(); return ""; },
     after: `<div class="card"><h3>Idées clés de l'article</h3>${a.points.map(x => `<p style="margin:8px 0 0" class="row">${icon("check", 16)}<span>${esc(x)}</span></p>`).join("")}</div>` });

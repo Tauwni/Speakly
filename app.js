@@ -69,8 +69,32 @@ function setNav(tab) {
   $$("nav button").forEach(b => b.onclick = () => go(b.dataset.go));
 }
 const SCREENS = {};
-function go(p, ...a) { clearInterval(window.__tm); try { speechSynthesis.cancel(); } catch (e) {} $$(".feedback").forEach(f => f.remove()); window.scrollTo(0, 0); SCREENS[p](...a); }
+function go(p, ...a) { clearInterval(window.__tm); $$(".toast").forEach(t => p === "lesson" || t.remove()); try { speechSynthesis.cancel(); } catch (e) {} $$(".feedback").forEach(f => f.remove()); window.scrollTo(0, 0); SCREENS[p](...a); }
 const appbar = () => `<div class="appbar"><div class="brand">${logo(34)}Speakly</div><div class="chips"><span class="chip fire">${icon("flame", 17)}${S.streak}</span><span class="chip xp">${icon("bolt", 17)}${S.xp}</span></div></div>`;
+
+// ===== Sessions en cours (reprise) =====
+const RES = () => (S.resume = S.resume || {});
+function resSave(k, data) { RES()[k] = Object.assign({ date: today() }, data); save(); }
+function resDrop(k) { if (S.resume && S.resume[k]) { delete S.resume[k]; save(); } }
+const resLabel = r => `${r.solved} / ${r.total} exercice${r.total > 1 ? "s" : ""} réussi${r.solved > 1 ? "s" : ""}`;
+function toast(msg) { $$(".toast").forEach(t => t.remove()); const t = document.createElement("div"); t.className = "toast"; t.innerHTML = `${icon("check", 18)}<span>${esc(msg)}</span>`; document.body.appendChild(t); setTimeout(() => t.classList.add("out"), 2200); setTimeout(() => t.remove(), 2700); }
+function resumeAsk(r, onResume, onRestart, back) {
+  setNav(null);
+  app.innerHTML = `<div class="topbar"><button class="iconbtn plain" id="rb">${icon("back")}</button><div style="flex:1"><div class="kicker" style="margin:0">Session en cours</div><h3>${esc(r.title)}</h3></div></div>
+   <div class="card center"><div class="result-icon" style="margin-top:8px">${icon("play", 44)}</div><h3>Reprendre là où tu t'étais arrêté ?</h3>
+    <p class="muted">${resLabel(r)} · sauvegardé le ${r.date.split("-").reverse().join("/")}</p><div class="bar"><i style="width:${r.solved / r.total * 100}%"></i></div></div>
+   <button class="btn" id="rr">${icon("play", 18)}Reprendre</button><button class="btn sec" id="rs">${icon("reset", 18)}Recommencer depuis le début</button>`;
+  $("#rb").onclick = back; $("#rr").onclick = onResume; $("#rs").onclick = onRestart;
+}
+function resumeCards() {
+  const list = Object.entries(S.resume || {}).filter(([, r]) => r.re && r.total);
+  if (!list.length) return "";
+  return `<div class="unit">Reprendre</div>` + list.slice(-4).reverse().map(([k, r]) => `<div class="card row resume" style="cursor:pointer" data-re="${esc(r.re)}"><div class="iconbtn">${icon("play")}</div><div style="flex:1;min-width:0"><b>${esc(r.title)}</b><div class="muted small">${resLabel(r)}</div><div class="bar" style="height:6px;margin-top:6px"><i style="width:${r.solved / r.total * 100}%"></i></div></div><button class="iconbtn plain sm" data-drop="${esc(k)}" title="Abandonner">${icon("close", 18)}</button></div>`).join("");
+}
+function bindResumeCards() {
+  $$("[data-drop]").forEach(b => b.onclick = ev => { ev.stopPropagation(); if (confirm("Abandonner cette session en cours ?")) { resDrop(b.dataset.drop); go("home"); } });
+  $$(".resume[data-re]").forEach(c => c.onclick = () => new Function(c.dataset.re)());
+}
 
 // ===== Accueil =====
 SCREENS.welcome = function () {
@@ -136,8 +160,9 @@ SCREENS.home = function () {
      <div class="meta">${nx.words.length} mots · ${nx.quiz.length + nx.sentences.length} exercices de grammaire${nx.read ? " · lecture" : ""}</div>
      <div class="row between small" style="margin-top:16px;opacity:.9"><span>Objectif du jour</span><span>${Math.min(tx, S.goal)} / ${S.goal} XP</span></div>
      <div class="bar" style="margin-top:6px"><i style="width:${Math.min(100, tx / S.goal * 100)}%"></i></div>
-     <button class="btn light" onclick="go('lesson','${nx.id}')">${icon("play", 18)}${S.done[ALL[0].id] || total ? "Continuer" : "Commencer"}</button></div>`
+     <button class="btn light" onclick="go('lesson','${nx.id}')">${icon("play", 18)}${RES()["les:" + nx.id] ? `Reprendre la leçon (${RES()["les:" + nx.id].solved}/${RES()["les:" + nx.id].total})` : S.done[ALL[0].id] || total ? "Continuer" : "Commencer"}</button></div>`
      : `<div class="hero"><div class="eyebrow">Parcours terminé</div><h2>Bravo ${esc(S.name)} !</h2><div class="meta">Tu as terminé les ${ALL.length} leçons. Continue les révisions pour garder ton niveau.</div></div>`}
+   ${resumeCards()}
    ${dscgHomeCard()}
    ${due ? `<div class="card row" style="cursor:pointer" onclick="go('review')"><div class="iconbtn">${icon("brain")}</div><div style="flex:1"><b>${due} mot${due > 1 ? "s" : ""} à réviser</b><div class="muted small">Révise maintenant pour les fixer dans ta mémoire</div></div>${icon("arrow", 20)}</div>` : ""}
    ${errTodo().length ? `<div class="card row" style="cursor:pointer" onclick="go('errors')"><div class="iconbtn" style="background:var(--ko-soft);color:var(--ko)">${icon("fix")}</div><div style="flex:1"><b>${errTodo().length} erreur${errTodo().length > 1 ? "s" : ""} à retravailler</b><div class="muted small">Corrige tes points faibles en quelques minutes</div></div>${icon("arrow", 20)}</div>` : ""}
@@ -155,6 +180,7 @@ SCREENS.home = function () {
    }).join("")}`;
   $$(".level-head").forEach(h => h.onclick = () => { S.openLv = S.openLv === h.dataset.lv ? "-" : h.dataset.lv; save(); go("home"); });
   $$("[data-les]").forEach(e => e.onclick = () => go("lesson", e.dataset.les));
+  bindResumeCards();
 };
 
 // ----- test de passage -----
@@ -198,7 +224,7 @@ SCREENS.lesson = function (id) {
    <div class="card"><div class="row" style="color:var(--pri)">${icon("book", 20)}<h3>Vocabulaire (${W.length})</h3></div>
     ${W.map((w, i) => `<div class="vocab"><button class="iconbtn plain" data-say="${i}">${icon("speaker", 19)}</button><div><div class="en">${esc(w.en)}</div><div class="fr">${esc(w.fr)}</div></div></div>`).join("")}</div>
    ${les.sentences.length ? `<div class="card"><div class="row" style="color:var(--pri)">${icon("doc", 20)}<h3>Exemples</h3></div>${les.sentences.map((s, i) => `<div class="vocab"><button class="iconbtn plain" data-ss="${i}">${icon("speaker", 19)}</button><div><div class="en">${esc(s.en)}</div><div class="fr">${esc(s.fr)}</div></div></div>`).join("")}</div>` : ""}
-   <button class="btn" onclick="go('exercises','${id}')">Commencer les exercices ${icon("arrow", 20)}</button>`;
+   ${RES()["les:" + id] ? `<button class="btn" onclick="go('exercises','${id}','resume')">${icon("play", 18)}Reprendre les exercices (${RES()["les:" + id].solved} / ${RES()["les:" + id].total})</button><button class="btn sec" onclick="go('exercises','${id}','restart')">Recommencer depuis le début</button>` : `<button class="btn" onclick="go('exercises','${id}')">Commencer les exercices ${icon("arrow", 20)}</button>`}`;
   const draw = () => { $("#fc").innerHTML = `<div class="w">${esc(flip ? W[k].fr : W[k].en)}</div><div class="h">${flip ? "français" : "touche pour traduire"}</div>`; $("#cnt").textContent = `${k + 1} / ${W.length}`; };
   $("#fc").onclick = () => { flip = !flip; draw(); };
   $("#prev").onclick = () => { k = (k + W.length - 1) % W.length; flip = false; draw(); speak(W[k].en); };
@@ -246,19 +272,27 @@ function clozeEx(s) {
   return { type: "type", kicker: "Phrase à trous", q: `Complète : « ${ws.map((w, i) => i === k ? w.replace(word, "___") : w).join(" ")} »`, sub: s.fr, a: word, say: s.en, exact: true, ph: "Le mot manquant", cat: "sent" };
 }
 
-SCREENS.exercises = function (id) {
-  const les = ALL.find(l => l.id === id); setNav(null);
-  const queue = buildExercises(les), total = queue.length; let firstTry = 0, solved = 0; const missed = new Set();
+SCREENS.exercises = function (id, mode) {
+  const les = ALL.find(l => l.id === id), rk = "les:" + id, saved = RES()[rk]; setNav(null);
+  if (saved && !mode) return resumeAsk(saved, () => go("exercises", id, "resume"), () => go("exercises", id, "restart"), () => go("lesson", id));
+  if (mode === "restart") resDrop(rk);
+  const R = mode === "resume" && saved;
+  let queue, total, firstTry = 0, solved = 0, missed = new Set();
+  if (R) { queue = R.q; total = R.total; firstTry = R.first; solved = R.solved; missed = new Set(R.missed); }
+  else { queue = buildExercises(les); queue.forEach((e, i) => e._k = i); total = queue.length; }
+  const keep = cur => resSave(rk, { title: les.title, re: `go('exercises','${id}','resume')`, q: [cur, ...queue], total, first: firstTry, solved, missed: [...missed] });
   const next = () => {
-    if (!queue.length) return result();
+    if (!queue.length) { resDrop(rk); return result(); }
     const e = queue.shift();
     e.track = !["speak", "match"].includes(e.type); e.les = les.id; e.lv = les.level;
+    keep(e);
     play(e, (good, given) => {
-      if (e.track && (!good || !missed.has(e))) errSeen(e, good, given);
-      if (good) { solved++; if (!missed.has(e)) firstTry++; S.answers.ok++; if (e.word) srsAdd(e.word, true); }
-      else { S.answers.ko++; missed.add(e); queue.splice(Math.min(queue.length, 3), 0, e); if (e.word) srsAdd(e.word, false); }
+      const seen = missed.has(e._k);
+      if (e.track && (!good || !seen)) errSeen(e, good, given);
+      if (good) { solved++; if (!seen) firstTry++; S.answers.ok++; if (e.word) srsAdd(e.word, true); }
+      else { S.answers.ko++; missed.add(e._k); queue.splice(Math.min(queue.length, 3), 0, e); if (e.word) srsAdd(e.word, false); }
       save(); next();
-    }, solved / total, () => go("lesson", id));
+    }, solved / total, () => { toast("Progression sauvegardée : tu pourras reprendre plus tard."); go("lesson", id); });
   };
   const result = () => {
     const pct = Math.round(firstTry / total * 100), st = pct >= 90 ? 3 : pct >= 70 ? 2 : 1, gain = 10 + st * 5;
